@@ -1,0 +1,23 @@
+    {
+      "fields": {
+        "project": {
+          "id": "14603"
+        },
+        "summary": "verifyThatInformationAboutCaseAssigneeIsPresented",
+        "issuetype": {
+          "id": "155"
+        },
+        "assignee": {
+          "name": "s7t4m5"
+        },
+        "reporter": {
+          "name": "s7t4m5"
+        },
+        "priority": {
+          "id": "4"
+        },
+        "labels": [
+          "Automation"
+        ]
+      }
+    }
