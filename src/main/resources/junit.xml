@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<testsuite failures="2" name="cucumber.runtime.formatter.JUnitFormatter" skipped="0" tests="3" time="2.965239">
+<testcase classname="Me resource data retrieval" name="checks that proper user profile info can be retrieved" time="2.464494">
+<system-out><![CDATA[Given accept "application/json" mediaTypes..................................passed
+When the client performs GET request on /me/profile.........................passed
+Then status code is 200.....................................................passed
+And response contains property "id" of type "string"........................passed
+And response contains property "name" of type "string"......................passed
+And response contains property "email" containing phrase "@rcomext.com".....passed
+]]></system-out>
+</testcase>
+<testcase classname="Me resource data retrieval" name="test" time="0.232883">
+<failure message="java.lang.AssertionError: &#10;Expected: Path name contains a string containing &quot;John&quot;&#10;     but: was &quot;Igor Gursky&quot;&#13;&#10;&#9;at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)&#13;&#10;&#9;at org.junit.Assert.assertThat(Assert.java:956)&#13;&#10;&#9;at org.junit.Assert.assertThat(Assert.java:923)&#13;&#10;&#9;at lv.ctco.cukesrest.internal.AssertionFacadeImpl.bodyContainsJsonPathValueContainingPhrase(AssertionFacadeImpl.java:148)&#13;&#10;&#9;at lv.ctco.cukesrest.internal.switches.SwitchedByInterceptor.invoke(SwitchedByInterceptor.java:31)&#13;&#10;&#9;at lv.ctco.cukesrest.internal.context.InflateContextInterceptor.invoke(InflateContextInterceptor.java:30)&#13;&#10;&#9;at lv.ctco.cukesrest.api.ThenSteps.response_Body_Contains_Property_With_Phrase(ThenSteps.java:59)&#13;&#10;&#9;at ✽.And response contains property &quot;name&quot; containing phrase &quot;John&quot;(features/Me.feature:16)&#13;&#10;"><![CDATA[Given accept "application/json" mediaTypes..................................passed
+When the client performs GET request on /me/profile.........................passed
+Then status code is 200.....................................................passed
+And response contains property "id" of type "string"........................passed
+And response contains property "name" containing phrase "John"..............failed
+And response contains property "email" containing phrase "John@doe.org".....skipped
+
+StackTrace:
+java.lang.AssertionError: 
+Expected: Path name contains a string containing "John"
+     but: was "Igor Gursky"
+	at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
+	at org.junit.Assert.assertThat(Assert.java:956)
+	at org.junit.Assert.assertThat(Assert.java:923)
+	at lv.ctco.cukesrest.internal.AssertionFacadeImpl.bodyContainsJsonPathValueContainingPhrase(AssertionFacadeImpl.java:148)
+	at lv.ctco.cukesrest.internal.switches.SwitchedByInterceptor.invoke(SwitchedByInterceptor.java:31)
+	at lv.ctco.cukesrest.internal.context.InflateContextInterceptor.invoke(InflateContextInterceptor.java:30)
+	at lv.ctco.cukesrest.api.ThenSteps.response_Body_Contains_Property_With_Phrase(ThenSteps.java:59)
+	at ✽.And response contains property "name" containing phrase "John"(features/Me.feature:16)
+]]></failure>
+</testcase>
+<testcase classname="Me resource data retrieval" name="test2" time="0.267862">
+<failure message="java.lang.AssertionError: &#10;Expected: Path name contains a string containing &quot;John&quot;&#10;     but: was &quot;Igor Gursky&quot;&#13;&#10;&#9;at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)&#13;&#10;&#9;at org.junit.Assert.assertThat(Assert.java:956)&#13;&#10;&#9;at org.junit.Assert.assertThat(Assert.java:923)&#13;&#10;&#9;at lv.ctco.cukesrest.internal.AssertionFacadeImpl.bodyContainsJsonPathValueContainingPhrase(AssertionFacadeImpl.java:148)&#13;&#10;&#9;at lv.ctco.cukesrest.internal.switches.SwitchedByInterceptor.invoke(SwitchedByInterceptor.java:31)&#13;&#10;&#9;at lv.ctco.cukesrest.internal.context.InflateContextInterceptor.invoke(InflateContextInterceptor.java:30)&#13;&#10;&#9;at lv.ctco.cukesrest.api.ThenSteps.response_Body_Contains_Property_With_Phrase(ThenSteps.java:59)&#13;&#10;&#9;at ✽.And response contains property &quot;name&quot; containing phrase &quot;John&quot;(features/Me.feature:24)&#13;&#10;"><![CDATA[Given accept "application/json" mediaTypes..................................passed
+When the client performs GET request on /me/profile.........................passed
+Then status code is 200.....................................................passed
+And response contains property "id" of type "string"........................passed
+And response contains property "name" containing phrase "John"..............failed
+And response contains property "email" containing phrase "John@doe.org".....skipped
+
+StackTrace:
+java.lang.AssertionError: 
+Expected: Path name contains a string containing "John"
+     but: was "Igor Gursky"
+	at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
+	at org.junit.Assert.assertThat(Assert.java:956)
+	at org.junit.Assert.assertThat(Assert.java:923)
+	at lv.ctco.cukesrest.internal.AssertionFacadeImpl.bodyContainsJsonPathValueContainingPhrase(AssertionFacadeImpl.java:148)
+	at lv.ctco.cukesrest.internal.switches.SwitchedByInterceptor.invoke(SwitchedByInterceptor.java:31)
+	at lv.ctco.cukesrest.internal.context.InflateContextInterceptor.invoke(InflateContextInterceptor.java:30)
+	at lv.ctco.cukesrest.api.ThenSteps.response_Body_Contains_Property_With_Phrase(ThenSteps.java:59)
+	at ✽.And response contains property "name" containing phrase "John"(features/Me.feature:24)
+]]></failure>
+</testcase>
+</testsuite>
