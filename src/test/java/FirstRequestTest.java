@@ -23,9 +23,9 @@ import static com.jayway.restassured.RestAssured.preemptive;
  */
 public class FirstRequestTest {
 
-    private static String PASSWORD = "S29saW5pa3MwMw==";
+    private static String PASSWORD = "";
     private static String USER_NAME = "s7t4m5";
-    private static String BASE_URI = "http://jira.swissre.com/";
+    private static String BASE_URI = "http://jira..com/";
     private static String PROJECT_NAME = "L&H Client Portal";
 
     private static String TEST_CYCLE_NAME = "Regression";
