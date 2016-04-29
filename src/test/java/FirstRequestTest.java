@@ -1,5 +1,6 @@
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.restassured.RestAssured;
+import lv.ctco.tmm.ReportParser;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
 import org.junit.Before;
@@ -22,14 +23,14 @@ import static com.jayway.restassured.RestAssured.preemptive;
  */
 public class FirstRequestTest {
 
-    private static String PASSWORD = "";
-    private static String USER_NAME = "";
-    private static String BASE_URI = "";
+    private static String PASSWORD = "S29saW5pa3MwMw==";
+    private static String USER_NAME = "s7t4m5";
+    private static String BASE_URI = "http://jira.swissre.com/";
     private static String PROJECT_NAME = "L&H Client Portal";
 
     private static String TEST_CYCLE_NAME = "Regression";
-    //private static String PROJECT_VERSION_NAME = "UW Portal Pilot (June 2016)";
-    private static String PROJECT_VERSION_NAME = "UW Portal Global (Oct 2016)";
+    private static String PROJECT_VERSION_NAME = "UW Portal Pilot (June 2016)";
+    //private static String PROJECT_VERSION_NAME = "UW Portal Global (Oct 2016)";
 
     private static String CREATE_NEW_TEST_CYCLE_JSON = "CreateNewCycle_Name_ProjectId_VersionId.json";
     private static String CREATE_NEW_TEST_JSON = "CreateNewTest.json";
@@ -38,6 +39,14 @@ public class FirstRequestTest {
     public void setUp() {
         RestAssured.baseURI = BASE_URI;
         RestAssured.authentication = preemptive().basic(USER_NAME, StringUtils.newStringUtf8(Base64.decodeBase64(PASSWORD)));
+    }
+    @Test
+    public void doTest(){
+        ReportParser reportParser = new ReportParser();
+        reportParser.convertXmlToJsonAndCreateTC("C:\\Test\\cp\\cp_uw\\sr-cp-selenium-uw\\target\\allure-results\\");
+        System.out.println(reportParser.testCaseList.get(2).getName());
+        System.out.println(reportParser.testCaseList.get(2).getStatus());
+        System.out.println(reportParser.testCaseList.get(2).getJiraKey());
     }
 
     @Test
@@ -54,9 +63,6 @@ public class FirstRequestTest {
 
     @Test
     public void createNewTestCase() {
-        String projectId = getProjectId();
-
-        System.out.println(readFile(CREATE_NEW_TEST_JSON));
         given().header("X-Atlassian-Token", "nocheck")
                 .header("Content-Type", "application/json")
                 .body(readFile(CREATE_NEW_TEST_JSON))
@@ -76,11 +82,25 @@ public class FirstRequestTest {
     }
 
     @Test
-    public void getExecution() {
+    public void getExecutionIdTest() {
+        System.out.println(getExecutionId());
+    }
+
+    public int getExecutionId(){
+        List<Integer> executionId = JsonPath.parse(given().header("Content-Type", "application/json")
+                .when()
+                .get("rest/zapi/latest/execution?issueId=661910")
+                .then().statusCode(200).log().everything().extract().body().jsonPath().get()).read(String.format("$..[?(@.cycleId=='%s')].id", getCycleId()));
+        return executionId.get(0);
+    }
+
+    @Test
+    public void updateExecutionStatus() {
         given().header("X-Atlassian-Token", "nocheck")
                 .header("Content-Type", "application/json")
+                .body("{\"status\":\"1\"}") //PASSED=1;Failed=2;
                 .when()
-                .get("rest/zapi/latest/execution/")
+                .put("rest/zapi/latest/execution/" + getExecutionId() + "/execute")
                 .then().log().everything();
     }
 
@@ -167,7 +187,7 @@ public class FirstRequestTest {
 
 
     @Test
-    public void getCycleId() {
+    public void getCycleIdTest() {
         String cycleId=null;
         HashMap<String, HashMap<String, String>> response=given().header("Content-Type", "application/json")
                 .when()
@@ -183,6 +203,21 @@ public class FirstRequestTest {
         System.out.println(cycleId);
     }
 
+    public String getCycleId() {
+        String cycleId=null;
+        HashMap<String, HashMap<String, String>> response=given().header("Content-Type", "application/json")
+                .when()
+                .get("/rest/zapi/latest/cycle?projectId="+ getProjectId()+"&versionId="+getVersionId())
+                .then().statusCode(200).log().everything().extract().body().jsonPath().get("$..");
+        response.remove("recordsCount");
+
+        for (Map.Entry<String, HashMap<String, String>> c:response.entrySet()){
+            if (c.getValue().containsValue(TEST_CYCLE_NAME)) {
+                cycleId=c.getKey();
+            }
+        }
+        return cycleId;
+    }
 
     //&versionId=35430
     //&versionId=31240
