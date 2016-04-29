@@ -7,13 +7,13 @@ import java.util.Date;
  */
 public class TestCase {
 
+    private int jiraId;
+    private String jiraKey;
     private String name;
     private String status;
-    private String priority;
-    private String jiraKey;
     private String severity;
+    private String priority;
     private Date creationDate;
-    private int jiraId;
 
     public TestCase(String name, String status, String priority, String jiraKey, Date creationDate) {
         this.name = name;

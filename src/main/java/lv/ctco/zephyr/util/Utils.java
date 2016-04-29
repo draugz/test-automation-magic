@@ -8,16 +8,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 
 public class Utils {
 
-    public static ResultTestSuite readJunitXML(String path) throws Exception {
+    public static void log(String msg) {
+        System.out.println("##### " + msg);
+    }
+
+    public static ResultTestSuite readCucumberReport(String path) throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(ResultTestSuite.class);
-        URL resource = Utils.class.getProtectionDomain().getCodeSource().getLocation();
-        File file = Paths.get(resource.toURI().resolve(path)).toFile();
-        return (ResultTestSuite) jaxbContext.createUnmarshaller().unmarshal(file);
+        return (ResultTestSuite) jaxbContext.createUnmarshaller().unmarshal(resolveFile(path));
     }
 
     public static String readInputStream(InputStream is) throws IOException {
@@ -32,4 +35,11 @@ public class Utils {
         br.close();
         return response.toString();
     }
+
+    public static File resolveFile(String path) throws IOException, URISyntaxException {
+        URL resource = Utils.class.getProtectionDomain().getCodeSource().getLocation();
+        return Paths.get(resource.toURI().resolve(path)).toFile();
+    }
+
+
 }
