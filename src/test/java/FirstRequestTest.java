@@ -46,7 +46,7 @@ public class FirstRequestTest {
         reportParser.convertXmlToJsonAndCreateTC("C:\\Test\\cp\\cp_uw\\sr-cp-selenium-uw\\target\\allure-results\\");
         System.out.println(reportParser.testCaseList.get(2).getName());
         System.out.println(reportParser.testCaseList.get(2).getStatus());
-        System.out.println(reportParser.testCaseList.get(2).getId());
+        System.out.println(reportParser.testCaseList.get(2).getKey());
     }
 
     @Test

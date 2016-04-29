@@ -12,8 +12,8 @@ import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
  */
 public class TestCase {
 
-    private String id;
-    private int internalId;
+    private Integer id;
+    private String key;
     private String uniqueId;
     private String name;
     private TestStatus status = NOT_EXECUTED;
@@ -21,38 +21,38 @@ public class TestCase {
     private TestLevel priority = TestLevel.MEDIUM;
     private Date creationDate;
 
-    public TestCase(String name, TestStatus status, TestLevel priority, String id, Date creationDate) {
+    public TestCase(String name, TestStatus status, TestLevel priority, String key, Date creationDate) {
         this.name = name;
         this.status = status;
         this.priority = priority;
-        this.id = id;
+        this.key = key;
         this.creationDate = creationDate;
     }
 
-    public TestCase(String name, TestStatus status, String id) {
+    public TestCase(String name, TestStatus status, String key) {
 
         this.name = name;
         this.status = status;
-        this.id = id;
+        this.key = key;
     }
 
     public TestCase() {
     }
 
-    public String getId() {
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String id) {
+        this.key = id;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
-    }
-
-    public int getInternalId() {
-        return internalId;
-    }
-
-    public void setInternalId(int internalId) {
-        this.internalId = internalId;
     }
 
     public String getUniqueId() {

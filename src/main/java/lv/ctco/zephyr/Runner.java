@@ -7,7 +7,9 @@ import lv.ctco.zephyr.beans.jira.Issue;
 import lv.ctco.zephyr.beans.jira.SearchResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static lv.ctco.zephyr.Config.getValue;
 import static lv.ctco.zephyr.enums.ConfigProperty.PROJECT_KEY;
@@ -27,12 +29,28 @@ public class Runner {
         if (resultTestCases.size() == 0) return;
 
         List<Issue> issues = fetchTestIssues();
+        if (issues != null) {
+            mapToIssues(resultTestCases, issues);
+        }
+        System.out.println();
+    }
 
+    private static void mapToIssues(List<TestCase> resultTestCases, List<Issue> issues) {
+        Map<String, Issue> uniqueKeyMap = new HashMap<String, Issue>(issues.size());
         for (Issue issue : issues) {
-
+            String environment = issue.getFields().getEnvironment();
+            if (environment != null) {
+                uniqueKeyMap.put(environment, issue);
+            }
         }
 
+        for (TestCase testCase : resultTestCases) {
+            Issue issue = uniqueKeyMap.get(testCase.getUniqueId());
+            if (issue == null) continue;
 
+            testCase.setId(issue.getId());
+            testCase.setKey(issue.getKey());
+        }
     }
 
     private static List<Issue> fetchTestIssues() throws Exception {

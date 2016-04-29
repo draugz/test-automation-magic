@@ -34,7 +34,7 @@ public class JiraTCCreation {
         reportParser.convertXmlToJsonAndCreateTC(PERORT_DIRECTORY);
 
         for (TestCase currentTC:reportParser.getTCList()){
-            if(!currentTC.getId().equals("")){
+            if(!currentTC.getKey().equals("")){
 
             }else {
 
