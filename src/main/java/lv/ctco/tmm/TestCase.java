@@ -1,6 +1,11 @@
 package lv.ctco.tmm;
 
+import lv.ctco.zephyr.enums.TestLevel;
+import lv.ctco.zephyr.enums.TestStatus;
+
 import java.util.Date;
+
+import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
 
 /**
  * Created by S7T4M5 on 2016.04.22..
@@ -10,12 +15,12 @@ public class TestCase {
     private int jiraId;
     private String jiraKey;
     private String name;
-    private String status;
-    private String severity;
-    private String priority;
+    private TestStatus status = NOT_EXECUTED;
+    private TestLevel severity;
+    private TestLevel priority = TestLevel.MEDIUM;
     private Date creationDate;
 
-    public TestCase(String name, String status, String priority, String jiraKey, Date creationDate) {
+    public TestCase(String name, TestStatus status, TestLevel priority, String jiraKey, Date creationDate) {
         this.name = name;
         this.status = status;
         this.priority = priority;
@@ -23,7 +28,7 @@ public class TestCase {
         this.creationDate = creationDate;
     }
 
-    public TestCase(String name, String status, String jiraKey) {
+    public TestCase(String name, TestStatus status, String jiraKey) {
 
         this.name = name;
         this.status = status;
@@ -41,19 +46,19 @@ public class TestCase {
         this.name = name;
     }
 
-    public String getStatus() {
+    public TestStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TestStatus status) {
         this.status = status;
     }
 
-    public String getPriority() {
+    public TestLevel getPriority() {
         return priority;
     }
 
-    public void setPriority(String priority) {
+    public void setPriority(TestLevel priority) {
         this.priority = priority;
     }
 
@@ -81,11 +86,11 @@ public class TestCase {
         this.jiraId = jiraId;
     }
 
-    public String getSeverity() {
+    public TestLevel getSeverity() {
         return severity;
     }
 
-    public void setSeverity(String severity) {
+    public void setSeverity(TestLevel severity) {
         this.severity = severity;
     }
 }

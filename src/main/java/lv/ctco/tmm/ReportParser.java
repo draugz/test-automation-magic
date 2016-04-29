@@ -1,10 +1,9 @@
 package lv.ctco.tmm;
 
 import com.jayway.jsonpath.JsonPath;
-import net.minidev.json.JSONArray;
+import lv.ctco.zephyr.enums.TestStatus;
 import org.json.JSONObject;
 import org.json.XML;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +27,11 @@ public class ReportParser {
 
 
         for (int i=0; i<tcNames.size(); i++){
-            testCaseList.add(new TestCase(ifDoesNotExistsSetEmptyValue(tcNames, i), ifDoesNotExistsSetEmptyValue(tcStatus, i), ifDoesNotExistsSetEmptyValue(tcJiraKey, i)));
+            testCaseList.add(new TestCase(
+                    ifDoesNotExistsSetEmptyValue(tcNames, i),
+                    TestStatus.findById(Integer.valueOf(ifDoesNotExistsSetEmptyValue(tcStatus, i))),
+                    ifDoesNotExistsSetEmptyValue(tcJiraKey, i)
+            ));
         }
     }
 
