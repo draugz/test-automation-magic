@@ -67,6 +67,7 @@ public class Runner {
         for (ResultTestCase testCase : resultTestSuite.getTestcase()) {
             TestCase test = new TestCase();
             test.setName(testCase.getName());
+            result.add(test);
         }
         return result;
     }
