@@ -12,30 +12,55 @@ import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
  */
 public class TestCase {
 
-    private int jiraId;
-    private String jiraKey;
+    private String id;
+    private int internalId;
+    private String uniqueId;
     private String name;
     private TestStatus status = NOT_EXECUTED;
     private TestLevel severity;
     private TestLevel priority = TestLevel.MEDIUM;
     private Date creationDate;
 
-    public TestCase(String name, TestStatus status, TestLevel priority, String jiraKey, Date creationDate) {
+    public TestCase(String name, TestStatus status, TestLevel priority, String id, Date creationDate) {
         this.name = name;
         this.status = status;
         this.priority = priority;
-        this.jiraKey = jiraKey;
+        this.id = id;
         this.creationDate = creationDate;
     }
 
-    public TestCase(String name, TestStatus status, String jiraKey) {
+    public TestCase(String name, TestStatus status, String id) {
 
         this.name = name;
         this.status = status;
-        this.jiraKey = jiraKey;
+        this.id = id;
     }
 
     public TestCase() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getInternalId() {
+        return internalId;
+    }
+
+    public void setInternalId(int internalId) {
+        this.internalId = internalId;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
     }
 
     public String getName() {
@@ -54,6 +79,14 @@ public class TestCase {
         this.status = status;
     }
 
+    public TestLevel getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(TestLevel severity) {
+        this.severity = severity;
+    }
+
     public TestLevel getPriority() {
         return priority;
     }
@@ -62,35 +95,11 @@ public class TestCase {
         this.priority = priority;
     }
 
-    public String getJiraKey() {
-        return jiraKey;
-    }
-
-    public void setJiraKey(String jiraKey) {
-        this.jiraKey = jiraKey;
-    }
-
     public Date getCreationDate() {
         return creationDate;
     }
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
-    }
-
-    public int getJiraId() {
-        return jiraId;
-    }
-
-    public void setJiraId(int jiraId) {
-        this.jiraId = jiraId;
-    }
-
-    public TestLevel getSeverity() {
-        return severity;
-    }
-
-    public void setSeverity(TestLevel severity) {
-        this.severity = severity;
     }
 }

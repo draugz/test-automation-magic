@@ -13,12 +13,13 @@ import static lv.ctco.zephyr.Config.getValue;
 import static lv.ctco.zephyr.enums.ConfigProperty.PROJECT_KEY;
 import static lv.ctco.zephyr.util.HttpTransformer.deserialize;
 import static lv.ctco.zephyr.util.HttpUtils.getAndReturnBody;
+import static lv.ctco.zephyr.util.Utils.generateJiraKey;
 import static lv.ctco.zephyr.util.Utils.log;
 import static lv.ctco.zephyr.util.Utils.readCucumberReport;
 
 public class Runner {
 
-    public static int TOP = 20;
+    public static int TOP = 100;
     public static int SKIP = 0;
 
     public static void main(String[] args) throws Exception {
@@ -67,6 +68,7 @@ public class Runner {
         for (ResultTestCase testCase : resultTestSuite.getTestcase()) {
             TestCase test = new TestCase();
             test.setName(testCase.getName());
+            test.setUniqueId(generateJiraKey(testCase));
             result.add(test);
         }
         return result;

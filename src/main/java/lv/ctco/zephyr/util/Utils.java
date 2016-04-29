@@ -1,5 +1,6 @@
 package lv.ctco.zephyr.util;
 
+import lv.ctco.zephyr.beans.ResultTestCase;
 import lv.ctco.zephyr.beans.ResultTestSuite;
 
 import javax.xml.bind.JAXBContext;
@@ -41,5 +42,18 @@ public class Utils {
         return Paths.get(resource.toURI().resolve(path)).toFile();
     }
 
+    public static String generateJiraKey(ResultTestCase testCase) {
+        return String.join("-", normalizeKey(testCase.getClassname()), normalizeKey(testCase.getName()));
+    }
 
+    private static String normalizeKey(String input) {
+        if (input != null) {
+            String[] tokens = input.split(" ");
+            input = "";
+            for (String token : tokens) {
+                input += token.substring(0, 1).toUpperCase();
+            }
+        }
+        return input;
+    }
 }
