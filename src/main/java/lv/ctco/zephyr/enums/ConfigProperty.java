@@ -3,6 +3,7 @@ package lv.ctco.zephyr.enums;
 public enum ConfigProperty {
     JIRA_URL("jira.base.path"),
     PROJECT_KEY("jira.project.key"),
+    RELEASE_VERSION("jira.release.version"),
     USERNAME("auth.username"),
     PASSWORD("auth.password");
 

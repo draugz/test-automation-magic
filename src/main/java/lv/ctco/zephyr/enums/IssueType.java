@@ -1,14 +1,12 @@
 package lv.ctco.zephyr.enums;
 
-public enum TestLevel {
-    LOW("Low"),
-    MEDIUM("Medium"),
-    HIGH("High"),
-    CRITICAL("Critical");
+public enum IssueType {
+    DEFECT("Defect"),
+    TEST("Test");
 
     private String name;
 
-    TestLevel(String name) {
+    IssueType(String name) {
         this.name = name;
     }
 

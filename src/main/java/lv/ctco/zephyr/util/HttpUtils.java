@@ -12,7 +12,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 
 import static lv.ctco.zephyr.Config.getValue;
@@ -42,21 +41,18 @@ public class HttpUtils {
 
     public static String getAndReturnBody(String url) throws Exception {
         HttpResponse response = get(url);
-        InputStream content = response.getEntity().getContent();
-        return Utils.readInputStream(content);
+        return Utils.readInputStream(response.getEntity().getContent());
     }
 
-    public static HttpResponse post(String url, Object content) throws Exception {
-        String json = new Gson().toJson(content);
+    public static HttpResponse post(String url, Object entity) throws Exception {
+        String json = new Gson().toJson(entity);
 
         CloseableHttpClient httpClient = Config.getHttpClient();
         HttpPost request = new HttpPost(getValue(JIRA_URL) + url);
         request.setHeader("Content-Type", "application/json");
         request.setEntity(new StringEntity(json));
 
-        HttpResponse response = httpClient.execute(request);
-        httpClient.close();
-        return response;
+        return httpClient.execute(request);
     }
 
     public static Object jsonValue(String body, String path) {

@@ -1,10 +1,15 @@
 package lv.ctco.zephyr;
 
+import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 import lv.ctco.tmm.TestCase;
+import lv.ctco.zephyr.beans.Metafield;
 import lv.ctco.zephyr.beans.ResultTestCase;
 import lv.ctco.zephyr.beans.ResultTestSuite;
+import lv.ctco.zephyr.beans.jira.Fields;
 import lv.ctco.zephyr.beans.jira.Issue;
 import lv.ctco.zephyr.beans.jira.SearchResult;
+import lv.ctco.zephyr.util.HttpUtils;
+import org.apache.http.HttpResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +18,14 @@ import java.util.Map;
 
 import static lv.ctco.zephyr.Config.getValue;
 import static lv.ctco.zephyr.enums.ConfigProperty.PROJECT_KEY;
+import static lv.ctco.zephyr.enums.ConfigProperty.RELEASE_VERSION;
+import static lv.ctco.zephyr.enums.IssueType.TEST;
 import static lv.ctco.zephyr.util.HttpTransformer.deserialize;
 import static lv.ctco.zephyr.util.HttpUtils.getAndReturnBody;
 import static lv.ctco.zephyr.util.Utils.generateJiraKey;
 import static lv.ctco.zephyr.util.Utils.log;
 import static lv.ctco.zephyr.util.Utils.readCucumberReport;
+import static lv.ctco.zephyr.util.Utils.readInputStream;
 
 public class Runner {
 
@@ -32,7 +40,50 @@ public class Runner {
         if (issues != null) {
             mapToIssues(resultTestCases, issues);
         }
+
+        for (TestCase testCase : resultTestCases) {
+            if (testCase.getId() == null) {
+                createTestIssue(testCase);
+            }
+        }
         System.out.println();
+    }
+
+    private static void createTestIssue(TestCase testCase) throws Exception {
+        Issue issue = new Issue();
+        Fields fields = issue.getFields();
+        fields.setSummary(testCase.getName());
+        fields.setEnvironment(testCase.getUniqueId());
+
+        Metafield project = new Metafield();
+        project.setKey(Config.getValue(PROJECT_KEY));
+        fields.setProject(project);
+
+        Metafield issueType = new Metafield();
+        issueType.setName(TEST.getName());
+        fields.setIssuetype(issueType);
+
+        Metafield priority = new Metafield();
+        priority.setName(testCase.getPriority().getName());
+        fields.setPriority(priority);
+
+        List<Metafield> versions = new ArrayList<Metafield>(1);
+        Metafield version = new Metafield();
+        version.setName(Config.getValue(RELEASE_VERSION));
+        versions.add(version);
+        fields.setVersions(versions);
+
+        HttpResponse response = HttpUtils.post("api/2/issue", issue);
+        if (response.getStatusLine().getStatusCode() != 201) {
+            throw new InternalException("Could not create a Test issue in JIRA");
+        }
+
+        String responseBody = readInputStream(response.getEntity().getContent());
+        Metafield result = deserialize(responseBody, Metafield.class);
+        if (result != null) {
+            testCase.setId(Integer.valueOf(result.getId()));
+            testCase.setKey(result.getKey());
+        }
     }
 
     private static void mapToIssues(List<TestCase> resultTestCases, List<Issue> issues) {
