@@ -1,17 +1,17 @@
     {
       "fields": {
         "project": {
-          "id": "14603"
+          "id": "%s"
         },
-        "summary": "verifyThatInformationAboutCaseAssigneeIsPresented7",
+        "summary": "%s",
         "issuetype": {
           "id": "155"
         },
         "assignee": {
-          "name": "s7t4m5"
+          "name": "%s"
         },
         "reporter": {
-          "name": "s7t4m5"
+          "name": "%s"
         },
         "priority": {
           "id": "4"

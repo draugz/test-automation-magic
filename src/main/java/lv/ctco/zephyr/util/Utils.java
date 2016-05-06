@@ -2,6 +2,8 @@ package lv.ctco.zephyr.util;
 
 import lv.ctco.zephyr.beans.ResultTestCase;
 import lv.ctco.zephyr.beans.ResultTestSuite;
+import ru.yandex.qatools.allure.commons.AllureFileUtils;
+import ru.yandex.qatools.allure.model.TestSuiteResult;
 
 import javax.xml.bind.JAXBContext;
 import java.io.BufferedReader;
@@ -12,6 +14,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class Utils {
 
@@ -22,6 +25,10 @@ public class Utils {
     public static ResultTestSuite readCucumberReport(String path) throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(ResultTestSuite.class);
         return (ResultTestSuite) jaxbContext.createUnmarshaller().unmarshal(resolveFile(path));
+    }
+
+    public static List<TestSuiteResult> reatAllureReport(File... directories) throws IOException {
+        return AllureFileUtils.unmarshalSuites(directories);
     }
 
     public static String readInputStream(InputStream is) throws IOException {

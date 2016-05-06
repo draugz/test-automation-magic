@@ -1,2 +1,11 @@
-{"clonedCycleId":"","name":"%s","build":"","environment":"","description":"","startDate":"","endDate"
-:"","projectId":"%s","versionId":"%s"}
+{
+  "clonedCycleId": "",
+  "name": "%s",
+  "build": "",
+  "environment": "",
+  "description": "",
+  "startDate": "",
+  "endDate": "",
+  "projectId": "%s",
+  "versionId": "%s"
+}

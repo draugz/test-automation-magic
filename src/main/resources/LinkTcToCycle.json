@@ -1,8 +1,8 @@
 {
-  "issueId": 661910,
-  "versionId": "31240",
-  "cycleId": "2892",
-  "projectId": 14603,
+  "issueId": %s,
+  "versionId": "%s",
+  "cycleId": "%s",
+  "projectId": %s,
   "method":"1",
   "status": "2"
 }
