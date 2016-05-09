@@ -4,10 +4,7 @@ import lv.ctco.tmm.utils.ConfigReader;
 import lv.ctco.tmm.utils.RestHelper;
 import lv.ctco.zephyr.util.Utils;
 import org.apache.log4j.Logger;
-import ru.yandex.qatools.allure.model.Label;
-import ru.yandex.qatools.allure.model.Status;
-import ru.yandex.qatools.allure.model.TestCaseResult;
-import ru.yandex.qatools.allure.model.TestSuiteResult;
+import ru.yandex.qatools.allure.model.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,7 +80,34 @@ public class JiraTCCreationRunner {
                 return currentLabel.getValue();
             }
         }
-        LOG.info("Jira Key does not exists, new Test Case should ne created");
-        return restHelper.createTestCase(testCaseResult.getName());
+        LOG.info("Jira Key does not exists, new Test Case should be created");
+        int severityLevel=10122;
+
+        String severity="";
+        for (Label currentLabel : labels) {
+            if (currentLabel.getName().equals("severity") && !currentLabel.getValue().isEmpty()) {
+                severity=currentLabel.getValue();
+            }
+        }
+        if (!(severity.isEmpty())){
+            switch (SeverityLevel.fromValue(severity)) {
+                case TRIVIAL:
+                    severityLevel = 10124;
+                    break;
+                case MINOR:
+                    severityLevel = 10123;
+                    break;
+                case CRITICAL:
+                    severityLevel = 10121;
+                    break;
+                case BLOCKER:
+                    severityLevel = 10120;
+                    break;
+                default:
+                    severityLevel = 10122;
+            }
+
+        }
+        return restHelper.createTestCase(testCaseResult.getName(), severityLevel);
     }
 }

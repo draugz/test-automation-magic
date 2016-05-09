@@ -44,10 +44,10 @@ public class RestHelper {
         cycleId = getCycleId();
     }
 
-    public String createTestCase(String testCaseName) {
+    public String createTestCase(String testCaseName, int serenity) {
         return given().header("X-Atlassian-Token", "nocheck")
                 .header("Content-Type", "application/json")
-                .body(String.format(ConfigReader.readFile(CREATE_NEW_TEST_JSON), getProjectId(), testCaseName, USER_NAME, USER_NAME))
+                .body(String.format(ConfigReader.readFile(CREATE_NEW_TEST_JSON), getProjectId(), testCaseName, USER_NAME, USER_NAME, serenity))
                 .when()
                 .post("rest/api/2/issue")
                 .then().log().everything().extract().response().jsonPath().get("id");

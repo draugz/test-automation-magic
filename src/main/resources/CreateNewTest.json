@@ -16,6 +16,9 @@
         "priority": {
           "id": "4"
         },
+        "customfield_10067":{
+          "id":"%s"
+        },
         "labels": [
           "Automation"
         ]
