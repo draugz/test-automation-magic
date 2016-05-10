@@ -29,8 +29,8 @@ public class HttpUtils {
     }
 
     private static void setCommonHeaders(HttpRequestBase request) throws IOException, URISyntaxException {
-        request.setHeader("Authorization", String.format("Basic %s", getAuthString()));
         request.setHeader("Accept", "application/json");
+        request.setHeader("Authorization", "Basic " + getAuthString());
     }
 
     private static String getAuthString() throws IOException, URISyntaxException {
@@ -49,6 +49,7 @@ public class HttpUtils {
 
         CloseableHttpClient httpClient = Config.getHttpClient();
         HttpPost request = new HttpPost(getValue(JIRA_URL) + url);
+        setCommonHeaders(request);
         request.setHeader("Content-Type", "application/json");
         request.setEntity(new StringEntity(json));
 

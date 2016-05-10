@@ -4,6 +4,7 @@ public enum ConfigProperty {
     JIRA_URL("jira.base.path"),
     PROJECT_KEY("jira.project.key"),
     RELEASE_VERSION("jira.release.version"),
+    TEST_CYCLE("jira.test.cycle"),
     USERNAME("auth.username"),
     PASSWORD("auth.password");
 

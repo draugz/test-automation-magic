@@ -7,7 +7,10 @@ import lv.ctco.zephyr.beans.ResultTestCase;
 import lv.ctco.zephyr.beans.ResultTestSuite;
 import lv.ctco.zephyr.beans.jira.Fields;
 import lv.ctco.zephyr.beans.jira.Issue;
+import lv.ctco.zephyr.beans.jira.Project;
 import lv.ctco.zephyr.beans.jira.SearchResult;
+import lv.ctco.zephyr.beans.zapi.Cycle;
+import lv.ctco.zephyr.beans.zapi.CycleList;
 import lv.ctco.zephyr.util.HttpUtils;
 import org.apache.http.HttpResponse;
 
@@ -19,6 +22,7 @@ import java.util.Map;
 import static lv.ctco.zephyr.Config.getValue;
 import static lv.ctco.zephyr.enums.ConfigProperty.PROJECT_KEY;
 import static lv.ctco.zephyr.enums.ConfigProperty.RELEASE_VERSION;
+import static lv.ctco.zephyr.enums.ConfigProperty.TEST_CYCLE;
 import static lv.ctco.zephyr.enums.IssueType.TEST;
 import static lv.ctco.zephyr.util.HttpTransformer.deserialize;
 import static lv.ctco.zephyr.util.HttpUtils.getAndReturnBody;
@@ -32,21 +36,75 @@ public class Runner {
     public static int TOP = 100;
     public static int SKIP = 0;
 
+    public static String projectId;
+    public static String versionId;
+
     public static void main(String[] args) throws Exception {
         List<TestCase> resultTestCases = transform(readCucumberReport("junit.xml"));
         if (resultTestCases.size() == 0) return;
 
         List<Issue> issues = fetchTestIssues();
-        if (issues != null) {
-            mapToIssues(resultTestCases, issues);
-        }
+        if (issues == null) throw new RuntimeException("Unable to fetch JIRA issues");
+
+        mapToIssues(resultTestCases, issues);
 
         for (TestCase testCase : resultTestCases) {
             if (testCase.getId() == null) {
                 createTestIssue(testCase);
             }
         }
+
+        retrieveProjectMetaInfo();
+
+        String cycleId = getTestCycleId();
+        if (cycleId == null) throw new RuntimeException("Unable to retrieve JIRA test cycle");
+
+        for (TestCase testCase : resultTestCases) {
+            linkTestToCycle(testCase);
+        }
+
         System.out.println();
+    }
+
+    private static String getTestCycleId() throws Exception {
+        if (projectId == null || versionId == null) throw new RuntimeException("JIRA projectID or versionID are missing");
+
+        String response = getAndReturnBody(String.format("zapi/latest/cycle?projectId=%s&versionId=%s", projectId, versionId));
+        CycleList cycleList = deserialize(response, CycleList.class);
+        if (cycleList == null || cycleList.getCycleMap().size() == 0) return null;
+
+        for (Map.Entry<String, Cycle> entry : cycleList.getCycleMap().entrySet()) {
+            Cycle value = entry.getValue();
+            if (value != null
+                    && value.getProjectKey().equals(getValue(PROJECT_KEY))
+                    && value.getVersionId().toString().equals(versionId)
+                    && value.getName().equals(getValue(TEST_CYCLE))) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    private static void linkTestToCycle(TestCase testCase) {
+
+    }
+
+    private static void retrieveProjectMetaInfo() throws Exception {
+        String projectKey = getValue(PROJECT_KEY);
+        String response = getAndReturnBody("api/2/project/" + projectKey);
+        Project project = deserialize(response, Project.class);
+
+        if (project == null || !project.getKey().equals(projectKey)) {
+            throw new RuntimeException("Improper JIRA project retrieved");
+        }
+
+        projectId = project.getId();
+
+        for (Metafield version : project.getVersions()) {
+            if (version.getName().equals(getValue(RELEASE_VERSION))) {
+                versionId = version.getId();
+            }
+        }
     }
 
     private static void createTestIssue(TestCase testCase) throws Exception {
