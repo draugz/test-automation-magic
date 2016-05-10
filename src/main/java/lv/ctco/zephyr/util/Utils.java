@@ -1,8 +1,12 @@
 package lv.ctco.zephyr.util;
 
+import lv.ctco.tmm.ITestCase;
+import lv.ctco.tmm.TestCase;
+import lv.ctco.tmm.impl.TestCaseAllureImpl;
 import lv.ctco.zephyr.beans.ResultTestCase;
 import lv.ctco.zephyr.beans.ResultTestSuite;
 import ru.yandex.qatools.allure.commons.AllureFileUtils;
+import ru.yandex.qatools.allure.model.TestCaseResult;
 import ru.yandex.qatools.allure.model.TestSuiteResult;
 
 import javax.xml.bind.JAXBContext;
@@ -14,6 +18,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
@@ -27,8 +32,14 @@ public class Utils {
         return (ResultTestSuite) jaxbContext.createUnmarshaller().unmarshal(resolveFile(path));
     }
 
-    public static List<TestSuiteResult> reatAllureReport(File... directories) throws IOException {
-        return AllureFileUtils.unmarshalSuites(directories);
+    public static List<ITestCase> readAllureReport(File... directories) throws IOException {
+        List<ITestCase> testCases = new ArrayList<ITestCase>();
+        for (TestSuiteResult currentTestSuiteResult:AllureFileUtils.unmarshalSuites(directories)){
+            for (TestCaseResult currentTestCaseResult : currentTestSuiteResult.getTestCases()) {
+                testCases.add(new TestCaseAllureImpl(currentTestCaseResult));
+            }
+        }
+        return testCases;
     }
 
     public static String readInputStream(InputStream is) throws IOException {

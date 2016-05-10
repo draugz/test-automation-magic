@@ -1,9 +1,9 @@
 package lv.ctco.zephyr.enums;
 
 public enum TestStatus {
-    NOT_EXECUTED(1),
+    NOT_EXECUTED(0),
     FAILED(2),
-    PASSED(3);
+    PASSED(1);
 
     private int id;
 
@@ -21,6 +21,6 @@ public enum TestStatus {
                 return status;
             }
         }
-        return null;
+        throw new IllegalArgumentException();
     }
 }

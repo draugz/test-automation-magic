@@ -2,9 +2,9 @@ package lv.ctco.tmm;
 
 import lv.ctco.tmm.utils.ConfigReader;
 import lv.ctco.tmm.utils.RestHelper;
+import lv.ctco.zephyr.enums.TestStatus;
 import lv.ctco.zephyr.util.Utils;
 import org.apache.log4j.Logger;
-import ru.yandex.qatools.allure.model.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,9 +19,8 @@ import java.util.List;
 public class JiraTCCreationRunner {
 
     private static String REPORT_DIRECTORY = ConfigReader.getValueByKey("reportDirectory");
-    private static String TEST_CASE_ID_LABEL = "testId";
     private RestHelper restHelper;
-    private List<TestSuiteResult> testSuiteResult = new ArrayList<TestSuiteResult>();
+    private List<ITestCase> testCasesList = new ArrayList<ITestCase>();
     protected static final Logger LOG = Logger.getLogger(JiraTCCreationRunner.class);
 
     public static void main(String[] args) throws Exception {
@@ -30,84 +29,44 @@ public class JiraTCCreationRunner {
     }
 
     public void run() {
-        restHelper=new RestHelper();
+        restHelper = new RestHelper();
         LOG.info("Create list of Test Suites");
-        try {
-            testSuiteResult = Utils.reatAllureReport(new File(REPORT_DIRECTORY));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        LOG.info("For test suite");
-        for (TestSuiteResult currentTestSuite : testSuiteResult) {
-            LOG.info("For test case");
-            for (TestCaseResult currentTestCase : currentTestSuite.getTestCases()) {
-                createTestCaseAndLinkToTestCycleAndSetStatus(currentTestCase);
+        if (ConfigReader.getValueByKey("reportType").toLowerCase().equals("allure")) {
+            try {
+                testCasesList = Utils.readAllureReport(new File(REPORT_DIRECTORY));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-    }
-
-    private void updateTestCaseExecutionStatus(String testCaseId, Status testCaseStatus) {
-        LOG.info("Update test execution status");
-        switch (testCaseStatus){
-            case FAILED: restHelper.updateExecutionStatus(2, restHelper.getExecutionId(testCaseId));
-                break;
-            case BROKEN: restHelper.updateExecutionStatus(2, restHelper.getExecutionId(testCaseId));
-                break;
-            case PASSED: restHelper.updateExecutionStatus(1, restHelper.getExecutionId(testCaseId));
-                break;
-            default: restHelper.updateExecutionStatus(0, restHelper.getExecutionId(testCaseId));
+        LOG.info("For test case");
+        for (ITestCase currentTestCase : testCasesList) {
+            createTestCaseAndLinkToTestCycleAndSetStatus(currentTestCase);
         }
     }
 
-    public void createTestCaseAndLinkToTestCycleAndSetStatus(TestCaseResult testCaseResult) {
-        String testCaseId=restHelper.getIssueId(getTestCaseKey(testCaseResult));
-        assignToTestCycleAndSetStatus(testCaseId, testCaseResult);
+    private void updateTestCaseExecutionStatus(String testCaseId, TestStatus testCaseStatus) {
+        LOG.info("Update test execution status");
+        restHelper.updateExecutionStatus(testCaseStatus.getId(), restHelper.getExecutionId(testCaseId));
+    }
+
+    public void createTestCaseAndLinkToTestCycleAndSetStatus(ITestCase testCase) {
+        String testCaseId = restHelper.getIssueId(getTestCaseKey(testCase));
+        assignToTestCycleAndSetStatus(testCaseId, testCase);
     }
 
 
-    public void assignToTestCycleAndSetStatus(String testCaseId, TestCaseResult testCaseResult){
+    public void assignToTestCycleAndSetStatus(String testCaseId, ITestCase testCase) {
         LOG.info("Assign Test Case to Test cycle");
         restHelper.addToTestCycle(testCaseId);
-        updateTestCaseExecutionStatus(testCaseId, testCaseResult.getStatus());
+        updateTestCaseExecutionStatus(testCaseId, testCase.getStatus());
     }
 
-    private String getTestCaseKey(TestCaseResult testCaseResult) {
+    private String getTestCaseKey(ITestCase testCase) {
         LOG.info("Get Jira Key from the report");
-        List<Label> labels = testCaseResult.getLabels();
-        for (Label currentLabel : labels) {
-            if (currentLabel.getName().equals(TEST_CASE_ID_LABEL) && !currentLabel.getValue().isEmpty()) {
-                return currentLabel.getValue();
-            }
+        if (!(testCase.getTestCaseKey() == null)) {
+            return testCase.getTestCaseKey();
         }
         LOG.info("Jira Key does not exists, new Test Case should be created");
-        int severityLevel=10122;
-
-        String severity="";
-        for (Label currentLabel : labels) {
-            if (currentLabel.getName().equals("severity") && !currentLabel.getValue().isEmpty()) {
-                severity=currentLabel.getValue();
-            }
-        }
-        if (!(severity.isEmpty())){
-            switch (SeverityLevel.fromValue(severity)) {
-                case TRIVIAL:
-                    severityLevel = 10124;
-                    break;
-                case MINOR:
-                    severityLevel = 10123;
-                    break;
-                case CRITICAL:
-                    severityLevel = 10121;
-                    break;
-                case BLOCKER:
-                    severityLevel = 10120;
-                    break;
-                default:
-                    severityLevel = 10122;
-            }
-
-        }
-        return restHelper.createTestCase(testCaseResult.getName(), severityLevel);
+        return restHelper.createTestCase(testCase.getName(), testCase.getSeverity().getIndex());
     }
 }
