@@ -4,26 +4,8 @@ import java.util.List;
 
 public class SearchResult {
 
-    private int startAt;
-    private int maxResults;
     private int total;
     private List<Issue> issues;
-
-    public int getStartAt() {
-        return startAt;
-    }
-
-    public void setStartAt(int startAt) {
-        this.startAt = startAt;
-    }
-
-    public int getMaxResults() {
-        return maxResults;
-    }
-
-    public void setMaxResults(int maxResults) {
-        this.maxResults = maxResults;
-    }
 
     public int getTotal() {
         return total;

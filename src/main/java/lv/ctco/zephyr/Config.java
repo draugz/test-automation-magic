@@ -30,7 +30,7 @@ public class Config {
 
     public static String getValue(ConfigProperty property) throws IOException, URISyntaxException {
         Object value = properties.get(property.getName());
-        return value != null ? String.valueOf(value) : null;
+        return value != null ? String.valueOf(value).trim() : null;
     }
 
     public static CloseableHttpClient getHttpClient() throws Exception {

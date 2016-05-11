@@ -11,7 +11,10 @@ import lv.ctco.zephyr.beans.jira.Project;
 import lv.ctco.zephyr.beans.jira.SearchResult;
 import lv.ctco.zephyr.beans.zapi.Cycle;
 import lv.ctco.zephyr.beans.zapi.CycleList;
+import lv.ctco.zephyr.beans.zapi.Execution;
+import lv.ctco.zephyr.beans.zapi.ExecutionResult;
 import lv.ctco.zephyr.util.HttpUtils;
+import lv.ctco.zephyr.util.Utils;
 import org.apache.http.HttpResponse;
 
 import java.util.ArrayList;
@@ -38,6 +41,7 @@ public class Runner {
 
     public static String projectId;
     public static String versionId;
+    public static String cycleId;
 
     public static void main(String[] args) throws Exception {
         List<TestCase> resultTestCases = transform(readCucumberReport("junit.xml"));
@@ -56,11 +60,14 @@ public class Runner {
 
         retrieveProjectMetaInfo();
 
-        String cycleId = getTestCycleId();
+        cycleId = getTestCycleId();
         if (cycleId == null) throw new RuntimeException("Unable to retrieve JIRA test cycle");
 
+        Map<String, Execution> executions = fetchExecutions();
         for (TestCase testCase : resultTestCases) {
-            linkTestToCycle(testCase);
+            if (executions == null || executions.get(testCase.getKey()) == null) {
+                linkTestToCycle(testCase);
+            }
         }
 
         System.out.println();
@@ -79,14 +86,28 @@ public class Runner {
                     && value.getProjectKey().equals(getValue(PROJECT_KEY))
                     && value.getVersionId().toString().equals(versionId)
                     && value.getName().equals(getValue(TEST_CYCLE))) {
-                return entry.getKey();
+                String cycleId = entry.getKey();
+                Utils.log("Retrieved target Test Cycle ID - " + cycleId);
+                return cycleId;
             }
         }
         return null;
     }
 
-    private static void linkTestToCycle(TestCase testCase) {
+    private static void linkTestToCycle(TestCase testCase) throws Exception {
+        log("Linking Test case " + testCase.getKey() + " to Test Cycle");
 
+        Execution execution = new Execution();
+        execution.setProjectId(projectId);
+        execution.setVersionId(versionId);
+        execution.setCycleId(cycleId);
+        execution.setMethod(2);
+        execution.setIssueId(testCase.getId());
+
+        HttpResponse response = HttpUtils.post("zapi/latest/execution", execution);
+        if (response.getStatusLine().getStatusCode() != 200) {
+            throw new InternalException("Could not link " + testCase.getKey());
+        }
     }
 
     private static void retrieveProjectMetaInfo() throws Exception {
@@ -99,10 +120,12 @@ public class Runner {
         }
 
         projectId = project.getId();
+        log("Retrieved project ID - " + projectId);
 
         for (Metafield version : project.getVersions()) {
             if (version.getName().equals(getValue(RELEASE_VERSION))) {
                 versionId = version.getId();
+                log("Retrieved version ID - " + versionId);
             }
         }
     }
@@ -164,7 +187,8 @@ public class Runner {
 
     private static List<Issue> fetchTestIssues() throws Exception {
         log("Fetching JIRA Test issues for the project");
-        SearchResult searchResults = searchInJira(SKIP);
+        String search = "project='" + getValue(PROJECT_KEY) + "'%20and%20issueType=Test";
+        SearchResult searchResults = searchInJQL(search, SKIP);
         if (searchResults == null) return null;
 
         List<Issue> issues = searchResults.getIssues();
@@ -173,17 +197,46 @@ public class Runner {
         if (totalCount > TOP) {
             while (issues.size() != totalCount) {
                 SKIP += TOP;
-                issues.addAll(searchInJira(SKIP).getIssues());
+                issues.addAll(searchInJQL(search, SKIP).getIssues());
             }
         }
         log(String.format("Retrieved %s Test issues", issues.size()));
         return issues;
     }
 
-    private static SearchResult searchInJira(int skip) throws Exception {
-        String response = getAndReturnBody("api/2/search?jql=project=" + getValue(PROJECT_KEY) + "%20and%20issueType=Test" +
-                "&maxResults=" + TOP + "&startAt=" + skip);
+    private static Map<String, Execution> fetchExecutions() throws Exception {
+        log("Fetching JIRA Test Executions for the project");
+        String search = "project='" + getValue(PROJECT_KEY) + "'%20and%20fixVersion='"
+                + getValue(RELEASE_VERSION) + "'%20and%20cycleName='" + getValue(TEST_CYCLE) + "'";
+
+        ExecutionResult executionResult = searchInZQL(search, SKIP);
+        if (executionResult == null || executionResult.getExecutions().size() == 0) return null;
+
+        List<Execution> executions = executionResult.getExecutions();
+
+        int totalCount = executionResult.getTotalCount();
+        if (totalCount > TOP) {
+            while (executions.size() != totalCount) {
+                SKIP += TOP;
+                executions.addAll(searchInZQL(search, SKIP).getExecutions());
+            }
+        }
+        Map<String, Execution> result = new HashMap<String, Execution>(executions.size());
+        for (Execution execution : executions) {
+            result.put(execution.getIssueKey(), execution);
+        }
+        log(String.format("Retrieved %s Test executions", executions.size()));
+        return result;
+    }
+
+    private static SearchResult searchInJQL(String search, int skip) throws Exception {
+        String response = getAndReturnBody("api/2/search?jql=" + search + "&maxResults=" + TOP + "&startAt=" + skip);
         return deserialize(response, SearchResult.class);
+    }
+
+    private static ExecutionResult searchInZQL(String search, int skip) throws Exception {
+        String response = getAndReturnBody("zapi/latest/zql/executeSearch?zqlQuery=" + search + "&maxResults=" + TOP + "&startAt=" + skip);
+        return deserialize(response, ExecutionResult.class);
     }
 
     private static List<TestCase> transform(ResultTestSuite resultTestSuite) {
