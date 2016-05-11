@@ -85,92 +85,61 @@ public class Runner {
         System.out.println();
     }
 
-    private static void updateExecutionStatuses(Map<String, Execution> executions, List<TestCase> resultTestCases) throws Exception {
-        Map<TestStatus, List<String>> statusMap = new HashMap<TestStatus, List<String>>();
+    private static List<TestCase> transform(ResultTestSuite resultTestSuite) {
+        if (resultTestSuite.getTestcase() == null) {
+            return new ArrayList<TestCase>();
+        }
+
+        List<TestCase> result = new ArrayList<TestCase>();
+        for (ResultTestCase testCase : resultTestSuite.getTestcase()) {
+            TestCase test = new TestCase();
+            test.setName(testCase.getName());
+            test.setUniqueId(generateJiraKey(testCase));
+            test.setStatus(testCase.getError() != null || testCase.getFailure() != null ? TestStatus.FAILED : TestStatus.PASSED);
+            result.add(test);
+        }
+        return result;
+    }
+
+    private static List<Issue> fetchTestIssues() throws Exception {
+        log("Fetching JIRA Test issues for the project");
+        String search = "project='" + getValue(PROJECT_KEY) + "'%20and%20issueType=Test";
+        SearchResponse searchResults = searchInJQL(search, SKIP);
+        if (searchResults == null) return null;
+
+        List<Issue> issues = searchResults.getIssues();
+
+        int totalCount = searchResults.getTotal();
+        if (totalCount > TOP) {
+            while (issues.size() != totalCount) {
+                SKIP += TOP;
+                issues.addAll(searchInJQL(search, SKIP).getIssues());
+            }
+        }
+        log(String.format("Retrieved %s Test issues\n", issues.size()));
+        return issues;
+    }
+
+    private static SearchResponse searchInJQL(String search, int skip) throws Exception {
+        String response = getAndReturnBody("api/2/search?jql=" + search + "&maxResults=" + TOP + "&startAt=" + skip);
+        return deserialize(response, SearchResponse.class);
+    }
+
+    private static void mapToIssues(List<TestCase> resultTestCases, List<Issue> issues) {
+        Map<String, Issue> uniqueKeyMap = new HashMap<String, Issue>(issues.size());
+        for (Issue issue : issues) {
+            String environment = issue.getFields().getEnvironment();
+            if (environment != null) {
+                uniqueKeyMap.put(environment, issue);
+            }
+        }
 
         for (TestCase testCase : resultTestCases) {
-            TestStatus status = testCase.getStatus();
-            List<String> ids = statusMap.get(status);
-            if (ids == null) statusMap.put(status, new ArrayList<String>());
-            Execution execution = executions.get(testCase.getKey());
-            if (execution != null) {
-                statusMap.get(status).add(execution.getId().toString());
-            }
-        }
+            Issue issue = uniqueKeyMap.get(testCase.getUniqueId());
+            if (issue == null) continue;
 
-        for (Map.Entry<TestStatus, List<String>> entry : statusMap.entrySet()) {
-            for (String id : entry.getValue()) {
-                updateExecutionStatus(entry.getKey(), id);
-            }
-        }
-    }
-
-    private static void updateExecutionStatus(TestStatus status, String id) throws Exception {
-        log("Setting status " + status.name() + " to " + id + " test case");
-
-        ExecutionRequest request = new ExecutionRequest();
-        request.setStatus(status.getId());
-
-        HttpResponse response = HttpUtils.put("zapi/latest/execution/" + id + "/execute", request);
-        if (response.getStatusLine().getStatusCode() != 200) {
-            throw new InternalException("Could not successfully update execution status");
-        }
-    }
-
-    private static String getTestCycleId() throws Exception {
-        if (projectId == null || versionId == null) throw new RuntimeException("JIRA projectID or versionID are missing");
-
-        String response = getAndReturnBody(String.format("zapi/latest/cycle?projectId=%s&versionId=%s", projectId, versionId));
-        CycleList cycleList = deserialize(response, CycleList.class);
-        if (cycleList == null || cycleList.getCycleMap().size() == 0) return null;
-
-        for (Map.Entry<String, Cycle> entry : cycleList.getCycleMap().entrySet()) {
-            Cycle value = entry.getValue();
-            if (value != null
-                    && value.getProjectKey().equals(getValue(PROJECT_KEY))
-                    && value.getVersionId().toString().equals(versionId)
-                    && value.getName().equals(getValue(TEST_CYCLE))) {
-                String cycleId = entry.getKey();
-                Utils.log("Retrieved target Test Cycle ID - " + cycleId + "\n");
-                return cycleId;
-            }
-        }
-        return null;
-    }
-
-    private static void linkTestToCycle(List<String> keys) throws Exception {
-        log("Linking Test cases " + keys.toString() + " to Test Cycle");
-
-        Execution execution = new Execution();
-        execution.setProjectId(projectId);
-        execution.setVersionId(versionId);
-        execution.setCycleId(cycleId);
-        execution.setMethod(1);
-        execution.setIssues(keys);
-
-        HttpResponse response = HttpUtils.post("zapi/latest/execution/addTestsToCycle", execution);
-        if (response.getStatusLine().getStatusCode() != 200) {
-            throw new InternalException("Could not link Test cases\n");
-        }
-    }
-
-    private static void retrieveProjectMetaInfo() throws Exception {
-        String projectKey = getValue(PROJECT_KEY);
-        String response = getAndReturnBody("api/2/project/" + projectKey);
-        Project project = deserialize(response, Project.class);
-
-        if (project == null || !project.getKey().equals(projectKey)) {
-            throw new RuntimeException("Improper JIRA project retrieved");
-        }
-
-        projectId = project.getId();
-        log("Retrieved project ID - " + projectId);
-
-        for (Metafield version : project.getVersions()) {
-            if (version.getName().equals(getValue(RELEASE_VERSION))) {
-                versionId = version.getId();
-                log("Retrieved version ID - " + versionId);
-            }
+            testCase.setId(issue.getId());
+            testCase.setKey(issue.getKey());
         }
     }
 
@@ -211,41 +180,45 @@ public class Runner {
         }
     }
 
-    private static void mapToIssues(List<TestCase> resultTestCases, List<Issue> issues) {
-        Map<String, Issue> uniqueKeyMap = new HashMap<String, Issue>(issues.size());
-        for (Issue issue : issues) {
-            String environment = issue.getFields().getEnvironment();
-            if (environment != null) {
-                uniqueKeyMap.put(environment, issue);
-            }
+    private static void retrieveProjectMetaInfo() throws Exception {
+        String projectKey = getValue(PROJECT_KEY);
+        String response = getAndReturnBody("api/2/project/" + projectKey);
+        Project project = deserialize(response, Project.class);
+
+        if (project == null || !project.getKey().equals(projectKey)) {
+            throw new RuntimeException("Improper JIRA project retrieved");
         }
 
-        for (TestCase testCase : resultTestCases) {
-            Issue issue = uniqueKeyMap.get(testCase.getUniqueId());
-            if (issue == null) continue;
+        projectId = project.getId();
+        log("Retrieved project ID - " + projectId);
 
-            testCase.setId(issue.getId());
-            testCase.setKey(issue.getKey());
+        for (Metafield version : project.getVersions()) {
+            if (version.getName().equals(getValue(RELEASE_VERSION))) {
+                versionId = version.getId();
+                log("Retrieved version ID - " + versionId);
+            }
         }
     }
 
-    private static List<Issue> fetchTestIssues() throws Exception {
-        log("Fetching JIRA Test issues for the project");
-        String search = "project='" + getValue(PROJECT_KEY) + "'%20and%20issueType=Test";
-        SearchResponse searchResults = searchInJQL(search, SKIP);
-        if (searchResults == null) return null;
+    private static String getTestCycleId() throws Exception {
+        if (projectId == null || versionId == null) throw new RuntimeException("JIRA projectID or versionID are missing");
 
-        List<Issue> issues = searchResults.getIssues();
+        String response = getAndReturnBody(String.format("zapi/latest/cycle?projectId=%s&versionId=%s", projectId, versionId));
+        CycleList cycleList = deserialize(response, CycleList.class);
+        if (cycleList == null || cycleList.getCycleMap().size() == 0) return null;
 
-        int totalCount = searchResults.getTotal();
-        if (totalCount > TOP) {
-            while (issues.size() != totalCount) {
-                SKIP += TOP;
-                issues.addAll(searchInJQL(search, SKIP).getIssues());
+        for (Map.Entry<String, Cycle> entry : cycleList.getCycleMap().entrySet()) {
+            Cycle value = entry.getValue();
+            if (value != null
+                    && value.getProjectKey().equals(getValue(PROJECT_KEY))
+                    && value.getVersionId().toString().equals(versionId)
+                    && value.getName().equals(getValue(TEST_CYCLE))) {
+                String cycleId = entry.getKey();
+                Utils.log("Retrieved target Test Cycle ID - " + cycleId + "\n");
+                return cycleId;
             }
         }
-        log(String.format("Retrieved %s Test issues\n", issues.size()));
-        return issues;
+        return null;
     }
 
     private static Map<String, Execution> fetchAllExecutions() throws Exception {
@@ -273,37 +246,56 @@ public class Runner {
         return result;
     }
 
-    private static SearchResponse searchInJQL(String search, int skip) throws Exception {
-        String response = getAndReturnBody("api/2/search?jql=" + search + "&maxResults=" + TOP + "&startAt=" + skip);
-        return deserialize(response, SearchResponse.class);
-    }
-
     private static ExecutionResponse searchInZQL(String search, int skip) throws Exception {
         String response = getAndReturnBody("zapi/latest/zql/executeSearch?zqlQuery=" + search + "&maxResults=" + TOP + "&startAt=" + skip);
         return deserialize(response, ExecutionResponse.class);
     }
 
-    private static List<TestCase> transform(ResultTestSuite resultTestSuite) {
-        if (resultTestSuite.getTestcase() == null) {
-            return new ArrayList<TestCase>();
-        }
+    private static void linkTestToCycle(List<String> keys) throws Exception {
+        log("Linking Test cases " + keys.toString() + " to Test Cycle");
 
-        List<TestCase> result = new ArrayList<TestCase>();
-        for (ResultTestCase testCase : resultTestSuite.getTestcase()) {
-            TestCase test = new TestCase();
-            test.setName(testCase.getName());
-            test.setUniqueId(generateJiraKey(testCase));
-            test.setStatus(resolveTestStatus(testCase));
-            result.add(test);
+        Execution execution = new Execution();
+        execution.setProjectId(projectId);
+        execution.setVersionId(versionId);
+        execution.setCycleId(cycleId);
+        execution.setMethod(1);
+        execution.setIssues(keys);
+
+        HttpResponse response = HttpUtils.post("zapi/latest/execution/addTestsToCycle", execution);
+        if (response.getStatusLine().getStatusCode() != 200) {
+            throw new InternalException("Could not link Test cases\n");
         }
-        return result;
     }
 
-    private static TestStatus resolveTestStatus(ResultTestCase testCase) {
-        if (testCase.getError() != null || testCase.getFailure() != null) {
-            return TestStatus.FAILED;
-        } else {
-            return TestStatus.PASSED;
+    private static void updateExecutionStatuses(Map<String, Execution> executions, List<TestCase> resultTestCases) throws Exception {
+        Map<TestStatus, List<String>> statusMap = new HashMap<TestStatus, List<String>>();
+
+        for (TestCase testCase : resultTestCases) {
+            TestStatus status = testCase.getStatus();
+            List<String> ids = statusMap.get(status);
+            if (ids == null) statusMap.put(status, new ArrayList<String>());
+            Execution execution = executions.get(testCase.getKey());
+            if (execution != null) {
+                statusMap.get(status).add(execution.getId().toString());
+            }
+        }
+
+        for (Map.Entry<TestStatus, List<String>> entry : statusMap.entrySet()) {
+            for (String id : entry.getValue()) {
+                updateExecutionStatus(entry.getKey(), id);
+            }
+        }
+    }
+
+    private static void updateExecutionStatus(TestStatus status, String id) throws Exception {
+        log("Setting status " + status.name() + " to " + id + " test case");
+
+        ExecutionRequest request = new ExecutionRequest();
+        request.setStatus(status.getId());
+
+        HttpResponse response = HttpUtils.put("zapi/latest/execution/" + id + "/execute", request);
+        if (response.getStatusLine().getStatusCode() != 200) {
+            throw new InternalException("Could not successfully update execution status");
         }
     }
 }
