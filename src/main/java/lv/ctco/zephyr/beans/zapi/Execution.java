@@ -1,24 +1,22 @@
 package lv.ctco.zephyr.beans.zapi;
 
-import lv.ctco.zephyr.beans.Metafield;
+import java.util.List;
 
 public class Execution {
 
-    private int id;
+    private Integer id;
     private String issueKey;
     private String projectId;
     private String versionId;
-    private int issueId;
-    private int orderId;
+    private List<String> issues;
     private String cycleId;
     private int method;
-    private Metafield status;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -46,20 +44,12 @@ public class Execution {
         this.versionId = versionId;
     }
 
-    public int getIssueId() {
-        return issueId;
+    public List<String> getIssues() {
+        return issues;
     }
 
-    public void setIssueId(int issueId) {
-        this.issueId = issueId;
-    }
-
-    public int getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
+    public void setIssues(List<String> issues) {
+        this.issues = issues;
     }
 
     public String getCycleId() {
@@ -76,13 +66,5 @@ public class Execution {
 
     public void setMethod(int method) {
         this.method = method;
-    }
-
-    public Metafield getStatus() {
-        return status;
-    }
-
-    public void setStatus(Metafield status) {
-        this.status = status;
     }
 }

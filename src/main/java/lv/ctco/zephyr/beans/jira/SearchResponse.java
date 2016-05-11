@@ -2,7 +2,7 @@ package lv.ctco.zephyr.beans.jira;
 
 import java.util.List;
 
-public class SearchResult {
+public class SearchResponse {
 
     private int total;
     private List<Issue> issues;

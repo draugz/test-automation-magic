@@ -16,8 +16,6 @@ public class Config {
 
     private static Properties properties = loadConfigPropertiesFile("config.properties");
 
-    public static CloseableHttpClient httpClient = HttpClients.createDefault();
-
     private static Properties loadConfigPropertiesFile(String path) {
         Properties properties = new Properties();
         try {
@@ -34,6 +32,6 @@ public class Config {
     }
 
     public static CloseableHttpClient getHttpClient() throws Exception {
-        return httpClient;
+        return HttpClients.createDefault();
     }
 }

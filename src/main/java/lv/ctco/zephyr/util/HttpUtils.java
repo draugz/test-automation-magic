@@ -1,12 +1,13 @@
 package lv.ctco.zephyr.util;
 
 import com.google.gson.Gson;
-import com.jayway.jsonpath.JsonPath;
 import lv.ctco.zephyr.Config;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -52,26 +53,21 @@ public class HttpUtils {
         setCommonHeaders(request);
         request.setHeader("Content-Type", "application/json");
         request.setEntity(new StringEntity(json));
-
-        return httpClient.execute(request);
+        CloseableHttpResponse response = httpClient.execute(request);
+        response.close();
+        return response;
     }
 
-    public static Object jsonValue(String body, String path) {
-        return JsonPath.parse(body).read(path);
-    }
+    public static HttpResponse put(String url, Object entity) throws Exception {
+        String json = new Gson().toJson(entity);
 
-    public static String getStringValue(String body, String path) {
-        return String.valueOf(jsonValue(body, path));
-    }
-
-    public static Long getLongValue(String body, String path) {
-        Object obj = jsonValue(body, path);
-        if (obj instanceof Integer) {
-            return Long.valueOf((Integer) obj);
-        } else if (obj instanceof String) {
-            return Long.valueOf((String) obj);
-        } else {
-            return (Long) obj;
-        }
+        CloseableHttpClient httpClient = Config.getHttpClient();
+        HttpPut request = new HttpPut(getValue(JIRA_URL) + url);
+        setCommonHeaders(request);
+        request.setHeader("Content-Type", "application/json");
+        request.setEntity(new StringEntity(json));
+        CloseableHttpResponse response = httpClient.execute(request);
+        httpClient.close();
+        return response;
     }
 }

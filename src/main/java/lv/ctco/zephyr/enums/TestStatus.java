@@ -1,7 +1,7 @@
 package lv.ctco.zephyr.enums;
 
 public enum TestStatus {
-    NOT_EXECUTED(0),
+    NOT_EXECUTED(-1),
     FAILED(2),
     PASSED(1);
 
@@ -13,14 +13,5 @@ public enum TestStatus {
 
     public int getId() {
         return id;
-    }
-
-    public static TestStatus findById(int id) {
-        for (TestStatus status : values()) {
-            if (status.getId() == id) {
-                return status;
-            }
-        }
-        throw new IllegalArgumentException();
     }
 }

@@ -2,7 +2,7 @@ package lv.ctco.zephyr.beans.zapi;
 
 import java.util.List;
 
-public class ExecutionResult {
+public class ExecutionResponse {
 
     private int totalCount;
     private List<Execution> executions;

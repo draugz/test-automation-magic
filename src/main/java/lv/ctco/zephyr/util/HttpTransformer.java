@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class HttpTransformer {
@@ -16,15 +14,6 @@ public class HttpTransformer {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
-    }
-
-    public static <T> List<T> deserializeList(String response, Class<T> clazz) {
-        JavaType typeRef = mapper.getTypeFactory().constructCollectionType(List.class, clazz);
-        try {
-            return mapper.readValue(response, typeRef);
-        } catch (IOException e) {
-            return new ArrayList<T>();
-        }
     }
 
     public static <T> T deserialize(String response, Class<T> clazz) {
