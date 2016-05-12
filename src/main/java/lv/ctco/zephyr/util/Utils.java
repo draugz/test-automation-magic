@@ -46,7 +46,7 @@ public class Utils {
         return String.join("-", normalizeKey(testCase.getClassname()), normalizeKey(testCase.getName()));
     }
 
-    private static String normalizeKey(String input) {
+    public static String normalizeKey(String input) {
         if (input != null) {
             String[] tokens = input.split(" ");
             input = "";

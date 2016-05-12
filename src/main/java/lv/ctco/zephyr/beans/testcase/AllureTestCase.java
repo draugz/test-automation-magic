@@ -9,96 +9,72 @@ import ru.yandex.qatools.allure.model.TestCaseResult;
 
 import java.util.List;
 
+import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
+
 public class AllureTestCase implements TestCase {
 
-    private TestCaseResult testCaseResult;
-    private static String TEST_CASE_ID_LABEL = "testId";
+    private TestLevel priority = TestLevel.MEDIUM;
+    private Integer id;
+    private String key;
+    private String uniqueId;
+    private String name;
+    private TestStatus status = NOT_EXECUTED;
+    private TestLevel severity;
 
-    public AllureTestCase(TestCaseResult testCaseResult){
-        this.testCaseResult=testCaseResult;
-    }
 
     public TestStatus getStatus() {
-        switch (testCaseResult.getStatus()){
-            case FAILED: return TestStatus.FAILED;
-            case BROKEN: return TestStatus.FAILED;
-            case PASSED: return TestStatus.PASSED;
-            default: return TestStatus.NOT_EXECUTED;
-        }
+        return status;
     }
 
     public String getKey() {
-        List<Label> labels = testCaseResult.getLabels();
-        for (Label currentLabel : labels) {
-            if (currentLabel.getName().equals(TEST_CASE_ID_LABEL) && !currentLabel.getValue().isEmpty()) {
-                return currentLabel.getValue();
-            }
-        }
-        return null;
+        return key;
     }
 
     public TestLevel getSeverity() {
-        String severity="";
-
-        for (Label currentLabel : testCaseResult.getLabels()) {
-            if (currentLabel.getName().equals("severity") && !currentLabel.getValue().isEmpty()) {
-                severity=currentLabel.getValue();
-            }
-        }
-        if (!(severity.isEmpty())){
-            switch (SeverityLevel.fromValue(severity)) {
-                case TRIVIAL: return TestLevel.TRIVIAL;
-                case MINOR: return TestLevel.MINOR;
-                case CRITICAL: return TestLevel.CRITICAL;
-                case BLOCKER: return TestLevel.BLOCKER;
-                default: return TestLevel.MAJOR;
-            }
-
-        }
-        return TestLevel.MAJOR;
-    }
-
-    public String getName() {
-        return testCaseResult.getName();
-    }
-
-    public Integer getId() {
-        return null;
-    }
-
-    public void setId(Integer id) {
-
-    }
-
-    public void setStatus(TestStatus status) {
-
-    }
-
-    public String getUniqueId() {
-        return null;
-    }
-
-    public void setUniqueId(String uniqueId) {
-
-    }
-
-    public void setKey(String key) {
-
-    }
-
-    public void setSeverity(TestLevel severity) {
-
-    }
-
-    public void setName(String name) {
-
+        return severity;
     }
 
     public TestLevel getPriority() {
-        return null;
+        return priority;
     }
 
     public void setPriority(TestLevel priority) {
+        this.priority = priority;
+    }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStatus(TestStatus status) {
+        this.status = status;
+    }
+
+    public void setSeverity(TestLevel severity) {
+        this.severity = severity;
     }
 }

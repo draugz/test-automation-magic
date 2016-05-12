@@ -54,7 +54,6 @@ public class HttpUtils {
         request.setHeader("Content-Type", "application/json");
         request.setEntity(new StringEntity(json));
         CloseableHttpResponse response = httpClient.execute(request);
-        response.close();
         return response;
     }
 
