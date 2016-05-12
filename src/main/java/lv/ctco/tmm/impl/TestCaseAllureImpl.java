@@ -1,6 +1,6 @@
 package lv.ctco.tmm.impl;
 
-import lv.ctco.tmm.ITestCase;
+import lv.ctco.zephyr.beans.ITestCase;
 import lv.ctco.zephyr.enums.TestLevel;
 import lv.ctco.zephyr.enums.TestStatus;
 import ru.yandex.qatools.allure.model.Label;
@@ -9,9 +9,6 @@ import ru.yandex.qatools.allure.model.TestCaseResult;
 
 import java.util.List;
 
-/**
- * Created by S7T4M5 on 2016.05.10..
- */
 public class TestCaseAllureImpl implements ITestCase{
 
     private TestCaseResult testCaseResult;
@@ -38,10 +35,6 @@ public class TestCaseAllureImpl implements ITestCase{
             }
         }
         return null;
-    }
-
-    public Object getSteps() {
-        return testCaseResult.getSteps();
     }
 
     public TestLevel getSeverity() {

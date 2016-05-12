@@ -1,9 +1,5 @@
 package lv.ctco.tmm.utils;
 
-/**
- * Created by S7T4M5 on 2016.04.23..
- */
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

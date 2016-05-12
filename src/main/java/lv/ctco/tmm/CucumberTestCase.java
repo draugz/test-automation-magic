@@ -7,10 +7,7 @@ import java.util.Date;
 
 import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
 
-/**
- * Created by S7T4M5 on 2016.04.22..
- */
-public class TestCase {
+public class CucumberTestCase {
 
     private Integer id;
     private String key;
@@ -21,7 +18,7 @@ public class TestCase {
     private TestLevel priority = TestLevel.MEDIUM;
     private Date creationDate;
 
-    public TestCase(String name, TestStatus status, TestLevel priority, String key, Date creationDate) {
+    public CucumberTestCase(String name, TestStatus status, TestLevel priority, String key, Date creationDate) {
         this.name = name;
         this.status = status;
         this.priority = priority;
@@ -29,14 +26,14 @@ public class TestCase {
         this.creationDate = creationDate;
     }
 
-    public TestCase(String name, TestStatus status, String key) {
+    public CucumberTestCase(String name, TestStatus status, String key) {
 
         this.name = name;
         this.status = status;
         this.key = key;
     }
 
-    public TestCase() {
+    public CucumberTestCase() {
     }
 
     public String getKey() {

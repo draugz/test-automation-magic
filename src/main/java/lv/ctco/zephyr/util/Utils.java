@@ -1,7 +1,6 @@
 package lv.ctco.zephyr.util;
 
-import lv.ctco.tmm.ITestCase;
-import lv.ctco.tmm.TestCase;
+import lv.ctco.zephyr.beans.ITestCase;
 import lv.ctco.tmm.impl.TestCaseAllureImpl;
 import lv.ctco.zephyr.beans.ResultTestCase;
 import lv.ctco.zephyr.beans.ResultTestSuite;

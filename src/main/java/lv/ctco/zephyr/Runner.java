@@ -1,7 +1,7 @@
 package lv.ctco.zephyr;
 
 import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
-import lv.ctco.tmm.TestCase;
+import lv.ctco.tmm.CucumberTestCase;
 import lv.ctco.zephyr.beans.Metafield;
 import lv.ctco.zephyr.beans.ResultTestCase;
 import lv.ctco.zephyr.beans.ResultTestSuite;
@@ -46,7 +46,7 @@ public class Runner {
     public static String cycleId;
 
     public static void main(String[] args) throws Exception {
-        List<TestCase> resultTestCases = transform(readCucumberReport("junit.xml"));
+        List<CucumberTestCase> resultTestCases = transform(readCucumberReport("junit.xml"));
         if (resultTestCases.size() == 0) return;
 
         List<Issue> issues = fetchTestIssues();
@@ -54,7 +54,7 @@ public class Runner {
 
         mapToIssues(resultTestCases, issues);
 
-        for (TestCase testCase : resultTestCases) {
+        for (CucumberTestCase testCase : resultTestCases) {
             if (testCase.getId() == null) {
                 createTestIssue(testCase);
             }
@@ -68,7 +68,7 @@ public class Runner {
         Map<String, Execution> executions = fetchAllExecutions();
         List<String> keys = new ArrayList<String>();
 
-        for (TestCase testCase : resultTestCases) {
+        for (CucumberTestCase testCase : resultTestCases) {
             if (executions == null || executions.get(testCase.getKey()) == null) {
                 keys.add(testCase.getKey());
             }
@@ -85,14 +85,14 @@ public class Runner {
         System.out.println();
     }
 
-    private static List<TestCase> transform(ResultTestSuite resultTestSuite) {
+    private static List<CucumberTestCase> transform(ResultTestSuite resultTestSuite) {
         if (resultTestSuite.getTestcase() == null) {
-            return new ArrayList<TestCase>();
+            return new ArrayList<CucumberTestCase>();
         }
 
-        List<TestCase> result = new ArrayList<TestCase>();
+        List<CucumberTestCase> result = new ArrayList<CucumberTestCase>();
         for (ResultTestCase testCase : resultTestSuite.getTestcase()) {
-            TestCase test = new TestCase();
+            CucumberTestCase test = new CucumberTestCase();
             test.setName(testCase.getName());
             test.setUniqueId(generateJiraKey(testCase));
             test.setStatus(testCase.getError() != null || testCase.getFailure() != null ? TestStatus.FAILED : TestStatus.PASSED);
@@ -125,7 +125,7 @@ public class Runner {
         return deserialize(response, SearchResponse.class);
     }
 
-    private static void mapToIssues(List<TestCase> resultTestCases, List<Issue> issues) {
+    private static void mapToIssues(List<CucumberTestCase> resultTestCases, List<Issue> issues) {
         Map<String, Issue> uniqueKeyMap = new HashMap<String, Issue>(issues.size());
         for (Issue issue : issues) {
             String environment = issue.getFields().getEnvironment();
@@ -134,7 +134,7 @@ public class Runner {
             }
         }
 
-        for (TestCase testCase : resultTestCases) {
+        for (CucumberTestCase testCase : resultTestCases) {
             Issue issue = uniqueKeyMap.get(testCase.getUniqueId());
             if (issue == null) continue;
 
@@ -143,7 +143,7 @@ public class Runner {
         }
     }
 
-    private static void createTestIssue(TestCase testCase) throws Exception {
+    private static void createTestIssue(CucumberTestCase testCase) throws Exception {
         Issue issue = new Issue();
         Fields fields = issue.getFields();
         fields.setSummary(testCase.getName());
@@ -267,10 +267,10 @@ public class Runner {
         }
     }
 
-    private static void updateExecutionStatuses(Map<String, Execution> executions, List<TestCase> resultTestCases) throws Exception {
+    private static void updateExecutionStatuses(Map<String, Execution> executions, List<CucumberTestCase> resultTestCases) throws Exception {
         Map<TestStatus, List<String>> statusMap = new HashMap<TestStatus, List<String>>();
 
-        for (TestCase testCase : resultTestCases) {
+        for (CucumberTestCase testCase : resultTestCases) {
             TestStatus status = testCase.getStatus();
             List<String> ids = statusMap.get(status);
             if (ids == null) statusMap.put(status, new ArrayList<String>());

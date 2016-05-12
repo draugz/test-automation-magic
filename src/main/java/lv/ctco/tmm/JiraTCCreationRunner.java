@@ -2,6 +2,7 @@ package lv.ctco.tmm;
 
 import lv.ctco.tmm.utils.ConfigReader;
 import lv.ctco.tmm.utils.RestHelper;
+import lv.ctco.zephyr.beans.ITestCase;
 import lv.ctco.zephyr.enums.TestStatus;
 import lv.ctco.zephyr.util.Utils;
 import org.apache.log4j.Logger;
@@ -10,11 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-
-/**
- * Created by S7T4M5 on 2016.04.23..
- */
 
 public class JiraTCCreationRunner {
 
