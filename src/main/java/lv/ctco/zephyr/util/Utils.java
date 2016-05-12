@@ -1,6 +1,6 @@
 package lv.ctco.zephyr.util;
 
-import lv.ctco.zephyr.beans.ITestCase;
+import lv.ctco.zephyr.beans.TestCase;
 import lv.ctco.tmm.impl.TestCaseAllureImpl;
 import lv.ctco.zephyr.beans.ResultTestCase;
 import lv.ctco.zephyr.beans.ResultTestSuite;
@@ -31,8 +31,8 @@ public class Utils {
         return (ResultTestSuite) jaxbContext.createUnmarshaller().unmarshal(resolveFile(path));
     }
 
-    public static List<ITestCase> readAllureReport(File... directories) throws IOException {
-        List<ITestCase> testCases = new ArrayList<ITestCase>();
+    public static List<TestCase> readAllureReport(File... directories) throws IOException {
+        List<TestCase> testCases = new ArrayList<TestCase>();
         for (TestSuiteResult currentTestSuiteResult:AllureFileUtils.unmarshalSuites(directories)){
             for (TestCaseResult currentTestCaseResult : currentTestSuiteResult.getTestCases()) {
                 testCases.add(new TestCaseAllureImpl(currentTestCaseResult));

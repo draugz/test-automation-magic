@@ -1,7 +1,7 @@
 package lv.ctco.zephyr;
 
 import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
-import lv.ctco.tmm.CucumberTestCase;
+import lv.ctco.zephyr.beans.testcase.CucumberTestCase;
 import lv.ctco.zephyr.beans.Metafield;
 import lv.ctco.zephyr.beans.ResultTestCase;
 import lv.ctco.zephyr.beans.ResultTestSuite;
@@ -160,6 +160,10 @@ public class Runner {
         Metafield priority = new Metafield();
         priority.setName(testCase.getPriority().getName());
         fields.setPriority(priority);
+
+        Metafield severity = new Metafield();
+        severity.setId(testCase.getSeverity().getIndex().toString());
+        fields.setSeverity(severity);
 
         List<Metafield> versions = new ArrayList<Metafield>(1);
         Metafield version = new Metafield();

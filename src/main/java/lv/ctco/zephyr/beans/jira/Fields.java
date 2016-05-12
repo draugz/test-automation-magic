@@ -10,6 +10,7 @@ public class Fields {
     private Metafield project;
     private Metafield issuetype;
     private Metafield priority;
+    private Metafield customfield_10067;
     private List<Metafield> versions;
 
     public String getSummary() {
@@ -58,5 +59,13 @@ public class Fields {
 
     public void setPriority(Metafield priority) {
         this.priority = priority;
+    }
+
+    public Metafield getSeverity() {
+        return customfield_10067;
+    }
+
+    public void setSeverity(Metafield severity) {
+        this.customfield_10067 = severity;
     }
 }

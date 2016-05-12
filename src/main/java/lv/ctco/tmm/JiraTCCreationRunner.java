@@ -2,7 +2,7 @@ package lv.ctco.tmm;
 
 import lv.ctco.tmm.utils.ConfigReader;
 import lv.ctco.tmm.utils.RestHelper;
-import lv.ctco.zephyr.beans.ITestCase;
+import lv.ctco.zephyr.beans.TestCase;
 import lv.ctco.zephyr.enums.TestStatus;
 import lv.ctco.zephyr.util.Utils;
 import org.apache.log4j.Logger;
@@ -16,7 +16,7 @@ public class JiraTCCreationRunner {
 
     private static String REPORT_DIRECTORY = ConfigReader.getValueByKey("reportDirectory");
     private RestHelper restHelper;
-    private List<ITestCase> testCasesList = new ArrayList<ITestCase>();
+    private List<TestCase> testCasesList = new ArrayList<TestCase>();
     protected static final Logger LOG = Logger.getLogger(JiraTCCreationRunner.class);
 
     public static void main(String[] args) throws Exception {
@@ -35,7 +35,7 @@ public class JiraTCCreationRunner {
             }
         }
         LOG.info("For test case");
-        for (ITestCase currentTestCase : testCasesList) {
+        for (TestCase currentTestCase : testCasesList) {
             createTestCaseAndLinkToTestCycleAndSetStatus(currentTestCase);
         }
     }
@@ -45,22 +45,22 @@ public class JiraTCCreationRunner {
         restHelper.updateExecutionStatus(testCaseStatus.getId(), restHelper.getExecutionId(testCaseId));
     }
 
-    public void createTestCaseAndLinkToTestCycleAndSetStatus(ITestCase testCase) {
+    public void createTestCaseAndLinkToTestCycleAndSetStatus(TestCase testCase) {
         String testCaseId = restHelper.getIssueId(getTestCaseKey(testCase));
         assignToTestCycleAndSetStatus(testCaseId, testCase);
     }
 
 
-    public void assignToTestCycleAndSetStatus(String testCaseId, ITestCase testCase) {
+    public void assignToTestCycleAndSetStatus(String testCaseId, TestCase testCase) {
         LOG.info("Assign Test Case to Test cycle");
         restHelper.addToTestCycle(testCaseId);
         updateTestCaseExecutionStatus(testCaseId, testCase.getStatus());
     }
 
-    private String getTestCaseKey(ITestCase testCase) {
+    private String getTestCaseKey(TestCase testCase) {
         LOG.info("Get Jira Key from the report");
-        if (!(testCase.getTestCaseKey() == null)) {
-            return testCase.getTestCaseKey();
+        if (!(testCase.getKey() == null)) {
+            return testCase.getKey();
         }
         LOG.info("Jira Key does not exists, new Test Case should be created");
         return restHelper.createTestCase(testCase.getName(), testCase.getSeverity().getIndex());

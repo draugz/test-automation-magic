@@ -11,9 +11,9 @@ public enum TestLevel {
     CRITICAL("Critical", 10121);
 
     private String name;
-    private int severityIndex;
+    private Integer severityIndex;
 
-    TestLevel(String name, int severityIndex) {
+    TestLevel(String name, Integer severityIndex) {
         this.name = name;
         this.severityIndex=severityIndex;
     }
@@ -22,7 +22,7 @@ public enum TestLevel {
         return name;
     }
 
-    public int getIndex() {
+    public Integer getIndex() {
         return severityIndex;
     }
 }

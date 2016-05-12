@@ -1,6 +1,6 @@
 package lv.ctco.tmm.impl;
 
-import lv.ctco.zephyr.beans.ITestCase;
+import lv.ctco.zephyr.beans.TestCase;
 import lv.ctco.zephyr.enums.TestLevel;
 import lv.ctco.zephyr.enums.TestStatus;
 import ru.yandex.qatools.allure.model.Label;
@@ -9,7 +9,7 @@ import ru.yandex.qatools.allure.model.TestCaseResult;
 
 import java.util.List;
 
-public class TestCaseAllureImpl implements ITestCase{
+public class TestCaseAllureImpl implements TestCase {
 
     private TestCaseResult testCaseResult;
     private static String TEST_CASE_ID_LABEL = "testId";
@@ -27,7 +27,7 @@ public class TestCaseAllureImpl implements ITestCase{
         }
     }
 
-    public String getTestCaseKey() {
+    public String getKey() {
         List<Label> labels = testCaseResult.getLabels();
         for (Label currentLabel : labels) {
             if (currentLabel.getName().equals(TEST_CASE_ID_LABEL) && !currentLabel.getValue().isEmpty()) {
@@ -60,5 +60,37 @@ public class TestCaseAllureImpl implements ITestCase{
 
     public String getName() {
         return testCaseResult.getName();
+    }
+
+    public Integer getId() {
+        return null;
+    }
+
+    public void setId(Integer id) {
+
+    }
+
+    public void setStatus(TestStatus status) {
+
+    }
+
+    public String getUniqueId() {
+        return null;
+    }
+
+    public void setUniqueId(String uniqueId) {
+
+    }
+
+    public void setKey(String key) {
+
+    }
+
+    public void setSeverity(TestLevel severity) {
+
+    }
+
+    public void setName(String name) {
+
     }
 }

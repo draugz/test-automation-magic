@@ -1,13 +1,12 @@
-package lv.ctco.tmm;
+package lv.ctco.zephyr.beans.testcase;
 
+import lv.ctco.zephyr.beans.TestCase;
 import lv.ctco.zephyr.enums.TestLevel;
 import lv.ctco.zephyr.enums.TestStatus;
 
-import java.util.Date;
-
 import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
 
-public class CucumberTestCase {
+public class CucumberTestCase implements TestCase {
 
     private Integer id;
     private String key;
@@ -16,32 +15,8 @@ public class CucumberTestCase {
     private TestStatus status = NOT_EXECUTED;
     private TestLevel severity;
     private TestLevel priority = TestLevel.MEDIUM;
-    private Date creationDate;
-
-    public CucumberTestCase(String name, TestStatus status, TestLevel priority, String key, Date creationDate) {
-        this.name = name;
-        this.status = status;
-        this.priority = priority;
-        this.key = key;
-        this.creationDate = creationDate;
-    }
-
-    public CucumberTestCase(String name, TestStatus status, String key) {
-
-        this.name = name;
-        this.status = status;
-        this.key = key;
-    }
 
     public CucumberTestCase() {
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String id) {
-        this.key = id;
     }
 
     public Integer getId() {
@@ -50,6 +25,14 @@ public class CucumberTestCase {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getUniqueId() {
@@ -90,13 +73,5 @@ public class CucumberTestCase {
 
     public void setPriority(TestLevel priority) {
         this.priority = priority;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
     }
 }
