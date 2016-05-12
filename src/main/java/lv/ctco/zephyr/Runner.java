@@ -1,10 +1,8 @@
 package lv.ctco.zephyr;
 
 import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
-import lv.ctco.zephyr.beans.testcase.CucumberTestCase;
 import lv.ctco.zephyr.beans.Metafield;
-import lv.ctco.zephyr.beans.testresult.junit.JUnitResult;
-import lv.ctco.zephyr.beans.testresult.junit.JUnitResultTestSuite;
+import lv.ctco.zephyr.beans.TestCase;
 import lv.ctco.zephyr.beans.jira.Fields;
 import lv.ctco.zephyr.beans.jira.Issue;
 import lv.ctco.zephyr.beans.jira.Project;
@@ -14,6 +12,7 @@ import lv.ctco.zephyr.beans.zapi.CycleList;
 import lv.ctco.zephyr.beans.zapi.Execution;
 import lv.ctco.zephyr.beans.zapi.ExecutionRequest;
 import lv.ctco.zephyr.beans.zapi.ExecutionResponse;
+import lv.ctco.zephyr.enums.ReportType;
 import lv.ctco.zephyr.enums.TestStatus;
 import lv.ctco.zephyr.util.HttpUtils;
 import lv.ctco.zephyr.util.Utils;
@@ -27,13 +26,16 @@ import java.util.Map;
 import static lv.ctco.zephyr.Config.getValue;
 import static lv.ctco.zephyr.enums.ConfigProperty.PROJECT_KEY;
 import static lv.ctco.zephyr.enums.ConfigProperty.RELEASE_VERSION;
+import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_PATH;
+import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_TYPE;
 import static lv.ctco.zephyr.enums.ConfigProperty.TEST_CYCLE;
 import static lv.ctco.zephyr.enums.IssueType.TEST;
 import static lv.ctco.zephyr.util.HttpTransformer.deserialize;
 import static lv.ctco.zephyr.util.HttpUtils.getAndReturnBody;
-import static lv.ctco.zephyr.util.Utils.generateJiraKey;
+import static lv.ctco.zephyr.util.ReportTransformer.transform;
 import static lv.ctco.zephyr.util.Utils.log;
-import static lv.ctco.zephyr.util.Utils.readCucumberReport;
+import static lv.ctco.zephyr.util.Utils.readAllureReport;
+import static lv.ctco.zephyr.util.Utils.readJUnitReport;
 import static lv.ctco.zephyr.util.Utils.readInputStream;
 
 public class Runner {
@@ -46,15 +48,15 @@ public class Runner {
     public static String cycleId;
 
     public static void main(String[] args) throws Exception {
-        List<CucumberTestCase> resultTestCases = transform(readCucumberReport("junit.xml"));
-        if (resultTestCases.size() == 0) return;
+        List<TestCase> testCases = resolveTestCases(getValue(REPORT_PATH));
+        if (testCases == null || testCases.size() == 0) return;
 
         List<Issue> issues = fetchTestIssues();
         if (issues == null) throw new RuntimeException("Unable to fetch JIRA issues");
 
-        mapToIssues(resultTestCases, issues);
+        mapToIssues(testCases, issues);
 
-        for (CucumberTestCase testCase : resultTestCases) {
+        for (TestCase testCase : testCases) {
             if (testCase.getId() == null) {
                 createTestIssue(testCase);
             }
@@ -68,7 +70,7 @@ public class Runner {
         Map<String, Execution> executions = fetchAllExecutions();
         List<String> keys = new ArrayList<String>();
 
-        for (CucumberTestCase testCase : resultTestCases) {
+        for (TestCase testCase : testCases) {
             if (executions == null || executions.get(testCase.getKey()) == null) {
                 keys.add(testCase.getKey());
             }
@@ -80,25 +82,9 @@ public class Runner {
         }
 
         executions = fetchAllExecutions();
-        updateExecutionStatuses(executions, resultTestCases);
+        updateExecutionStatuses(executions, testCases);
 
         System.out.println();
-    }
-
-    private static List<CucumberTestCase> transform(JUnitResultTestSuite resultTestSuite) {
-        if (resultTestSuite.getTestcase() == null) {
-            return new ArrayList<CucumberTestCase>();
-        }
-
-        List<CucumberTestCase> result = new ArrayList<CucumberTestCase>();
-        for (JUnitResult testCase : resultTestSuite.getTestcase()) {
-            CucumberTestCase test = new CucumberTestCase();
-            test.setName(testCase.getName());
-            test.setUniqueId(generateJiraKey(testCase));
-            test.setStatus(testCase.getError() != null || testCase.getFailure() != null ? TestStatus.FAILED : TestStatus.PASSED);
-            result.add(test);
-        }
-        return result;
     }
 
     private static List<Issue> fetchTestIssues() throws Exception {
@@ -125,7 +111,7 @@ public class Runner {
         return deserialize(response, SearchResponse.class);
     }
 
-    private static void mapToIssues(List<CucumberTestCase> resultTestCases, List<Issue> issues) {
+    private static void mapToIssues(List<TestCase> resultTestCases, List<Issue> issues) {
         Map<String, Issue> uniqueKeyMap = new HashMap<String, Issue>(issues.size());
         for (Issue issue : issues) {
             String environment = issue.getFields().getEnvironment();
@@ -134,7 +120,7 @@ public class Runner {
             }
         }
 
-        for (CucumberTestCase testCase : resultTestCases) {
+        for (TestCase testCase : resultTestCases) {
             Issue issue = uniqueKeyMap.get(testCase.getUniqueId());
             if (issue == null) continue;
 
@@ -143,7 +129,7 @@ public class Runner {
         }
     }
 
-    private static void createTestIssue(CucumberTestCase testCase) throws Exception {
+    private static void createTestIssue(TestCase testCase) throws Exception {
         Issue issue = new Issue();
         Fields fields = issue.getFields();
         fields.setSummary(testCase.getName());
@@ -271,10 +257,10 @@ public class Runner {
         }
     }
 
-    private static void updateExecutionStatuses(Map<String, Execution> executions, List<CucumberTestCase> resultTestCases) throws Exception {
+    private static void updateExecutionStatuses(Map<String, Execution> executions, List<TestCase> resultTestCases) throws Exception {
         Map<TestStatus, List<String>> statusMap = new HashMap<TestStatus, List<String>>();
 
-        for (CucumberTestCase testCase : resultTestCases) {
+        for (TestCase testCase : resultTestCases) {
             TestStatus status = testCase.getStatus();
             List<String> ids = statusMap.get(status);
             if (ids == null) statusMap.put(status, new ArrayList<String>());
@@ -300,6 +286,20 @@ public class Runner {
         HttpResponse response = HttpUtils.put("zapi/latest/execution/" + id + "/execute", request);
         if (response.getStatusLine().getStatusCode() != 200) {
             throw new InternalException("Could not successfully update execution status");
+        }
+    }
+
+    private static List<TestCase> resolveTestCases(String path) throws Exception {
+        ReportType type = ReportType.findById(getValue(REPORT_TYPE));
+        if (type == null) throw new RuntimeException("Report type is not recognized!");
+
+        switch (type) {
+            case JUNIT:
+                return transform(readJUnitReport(path));
+            case ALLURE:
+                return transform(readAllureReport(path));
+            default:
+                return null;
         }
     }
 }

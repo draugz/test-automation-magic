@@ -4,13 +4,15 @@ import lv.ctco.tmm.utils.ConfigReader;
 import lv.ctco.tmm.utils.RestHelper;
 import lv.ctco.zephyr.beans.TestCase;
 import lv.ctco.zephyr.enums.TestStatus;
-import lv.ctco.zephyr.util.Utils;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static lv.ctco.zephyr.util.ReportTransformer.transform;
+import static lv.ctco.zephyr.util.Utils.readAllureReport;
 
 public class JiraTCCreationRunner {
 
@@ -24,12 +26,12 @@ public class JiraTCCreationRunner {
         j.run();
     }
 
-    public void run() {
+    public void run() throws URISyntaxException {
         restHelper = new RestHelper();
         LOG.info("Create list of Test Suites");
         if (ConfigReader.getValueByKey("reportType").toLowerCase().equals("allure")) {
             try {
-                testCasesList = Utils.readAllureReport(new File(REPORT_DIRECTORY));
+                testCasesList = transform(readAllureReport(REPORT_DIRECTORY));
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,6 +1,8 @@
 package lv.ctco.zephyr.enums;
 
 public enum ConfigProperty {
+    REPORT_PATH("report.path"),
+    REPORT_TYPE("report.type"),
     JIRA_URL("jira.base.path"),
     PROJECT_KEY("jira.project.key"),
     RELEASE_VERSION("jira.release.version"),

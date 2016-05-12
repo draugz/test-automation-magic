@@ -28,4 +28,8 @@ public interface TestCase {
     String getName();
 
     void setName(String name);
+
+    TestLevel getPriority();
+
+    void setPriority(TestLevel priority);
 }

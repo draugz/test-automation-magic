@@ -4,22 +4,21 @@ import lv.ctco.zephyr.enums.ConfigProperty;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
-import static lv.ctco.zephyr.util.Utils.resolveFile;
-
 public class Config {
 
-    private static Properties properties = loadConfigPropertiesFile("config.properties");
+    private static Properties properties = loadConfigPropertiesFile("src/main/resources/config.properties");
 
     private static Properties loadConfigPropertiesFile(String path) {
         Properties properties = new Properties();
         try {
-            properties.load(new InputStreamReader(new FileInputStream(resolveFile(path))));
+            properties.load(new InputStreamReader(new FileInputStream(new File(path))));
         } catch (Exception e) {
             throw new IllegalStateException("Cannot load properties file: " + path);
         }
@@ -28,7 +27,10 @@ public class Config {
 
     public static String getValue(ConfigProperty property) throws IOException, URISyntaxException {
         Object value = properties.get(property.getName());
-        return value != null ? String.valueOf(value).trim() : null;
+        if (value != null) {
+            return String.valueOf(value).trim();
+        }
+        throw new RuntimeException("Property " + property.name() + " is not found in the config file!");
     }
 
     public static CloseableHttpClient getHttpClient() throws Exception {

@@ -1,11 +1,8 @@
 package lv.ctco.zephyr.util;
 
-import lv.ctco.zephyr.beans.TestCase;
-import lv.ctco.zephyr.beans.testcase.AllureTestCase;
 import lv.ctco.zephyr.beans.testresult.junit.JUnitResult;
 import lv.ctco.zephyr.beans.testresult.junit.JUnitResultTestSuite;
 import ru.yandex.qatools.allure.commons.AllureFileUtils;
-import ru.yandex.qatools.allure.model.TestCaseResult;
 import ru.yandex.qatools.allure.model.TestSuiteResult;
 
 import javax.xml.bind.JAXBContext;
@@ -15,9 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
@@ -26,19 +20,13 @@ public class Utils {
         System.out.println("##### " + msg);
     }
 
-    public static JUnitResultTestSuite readCucumberReport(String path) throws Exception {
+    public static JUnitResultTestSuite readJUnitReport(String path) throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(JUnitResultTestSuite.class);
-        return (JUnitResultTestSuite) jaxbContext.createUnmarshaller().unmarshal(resolveFile(path));
+        return (JUnitResultTestSuite) jaxbContext.createUnmarshaller().unmarshal(new File(path));
     }
 
-    public static List<TestCase> readAllureReport(File... directories) throws IOException {
-        List<TestCase> testCases = new ArrayList<TestCase>();
-        for (TestSuiteResult currentTestSuiteResult:AllureFileUtils.unmarshalSuites(directories)){
-            for (TestCaseResult currentTestCaseResult : currentTestSuiteResult.getTestCases()) {
-                testCases.add(new AllureTestCase(currentTestCaseResult));
-            }
-        }
-        return testCases;
+    public static List<TestSuiteResult> readAllureReport(String path) throws IOException, URISyntaxException {
+        return AllureFileUtils.unmarshalSuites(new File(path));
     }
 
     public static String readInputStream(InputStream is) throws IOException {
@@ -52,11 +40,6 @@ public class Utils {
         }
         br.close();
         return response.toString();
-    }
-
-    public static File resolveFile(String path) throws IOException, URISyntaxException {
-        URL resource = Utils.class.getProtectionDomain().getCodeSource().getLocation();
-        return Paths.get(resource.toURI().resolve(path)).toFile();
     }
 
     public static String generateJiraKey(JUnitResult testCase) {

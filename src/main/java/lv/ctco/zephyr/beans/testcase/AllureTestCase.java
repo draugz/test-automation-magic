@@ -93,4 +93,12 @@ public class AllureTestCase implements TestCase {
     public void setName(String name) {
 
     }
+
+    public TestLevel getPriority() {
+        return null;
+    }
+
+    public void setPriority(TestLevel priority) {
+
+    }
 }
