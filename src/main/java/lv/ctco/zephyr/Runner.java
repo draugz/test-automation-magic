@@ -3,8 +3,8 @@ package lv.ctco.zephyr;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 import lv.ctco.zephyr.beans.testcase.CucumberTestCase;
 import lv.ctco.zephyr.beans.Metafield;
-import lv.ctco.zephyr.beans.ResultTestCase;
-import lv.ctco.zephyr.beans.ResultTestSuite;
+import lv.ctco.zephyr.beans.testresult.junit.JUnitResult;
+import lv.ctco.zephyr.beans.testresult.junit.JUnitResultTestSuite;
 import lv.ctco.zephyr.beans.jira.Fields;
 import lv.ctco.zephyr.beans.jira.Issue;
 import lv.ctco.zephyr.beans.jira.Project;
@@ -85,13 +85,13 @@ public class Runner {
         System.out.println();
     }
 
-    private static List<CucumberTestCase> transform(ResultTestSuite resultTestSuite) {
+    private static List<CucumberTestCase> transform(JUnitResultTestSuite resultTestSuite) {
         if (resultTestSuite.getTestcase() == null) {
             return new ArrayList<CucumberTestCase>();
         }
 
         List<CucumberTestCase> result = new ArrayList<CucumberTestCase>();
-        for (ResultTestCase testCase : resultTestSuite.getTestcase()) {
+        for (JUnitResult testCase : resultTestSuite.getTestcase()) {
             CucumberTestCase test = new CucumberTestCase();
             test.setName(testCase.getName());
             test.setUniqueId(generateJiraKey(testCase));

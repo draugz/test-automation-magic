@@ -1,4 +1,4 @@
-package lv.ctco.zephyr.beans;
+package lv.ctco.zephyr.beans.testresult.junit;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,7 +15,7 @@ import java.math.BigDecimal;
         "error",
         "failure"
 })
-public class ResultTestCase {
+public class JUnitResult {
 
     protected Error error;
     protected Failure failure;

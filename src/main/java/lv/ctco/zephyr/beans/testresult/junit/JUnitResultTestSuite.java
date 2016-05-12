@@ -1,5 +1,5 @@
 
-package lv.ctco.zephyr.beans;
+package lv.ctco.zephyr.beans.testresult.junit;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -22,11 +22,11 @@ import java.util.List;
         "systemErr"
 })
 @XmlRootElement(name = "testsuite")
-public class ResultTestSuite {
+public class JUnitResultTestSuite {
 
     @XmlElement(required = true)
-    protected ResultTestCaseProperties properties;
-    protected List<ResultTestCase> testcase;
+    protected JUnitTCProperties properties;
+    protected List<JUnitResult> testcase;
     @XmlElement(name = "system-out", required = true)
     protected String systemOut;
     @XmlElement(name = "system-err", required = true)
@@ -48,17 +48,17 @@ public class ResultTestSuite {
     @XmlAttribute(name = "time", required = true)
     protected BigDecimal time;
 
-    public ResultTestCaseProperties getProperties() {
+    public JUnitTCProperties getProperties() {
         return properties;
     }
 
-    public void setProperties(ResultTestCaseProperties value) {
+    public void setProperties(JUnitTCProperties value) {
         this.properties = value;
     }
 
-    public List<ResultTestCase> getTestcase() {
+    public List<JUnitResult> getTestcase() {
         if (testcase == null) {
-            testcase = new ArrayList<ResultTestCase>();
+            testcase = new ArrayList<JUnitResult>();
         }
         return this.testcase;
     }

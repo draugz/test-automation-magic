@@ -1,4 +1,4 @@
-package lv.ctco.tmm.impl;
+package lv.ctco.zephyr.beans.testcase;
 
 import lv.ctco.zephyr.beans.TestCase;
 import lv.ctco.zephyr.enums.TestLevel;
@@ -9,12 +9,12 @@ import ru.yandex.qatools.allure.model.TestCaseResult;
 
 import java.util.List;
 
-public class TestCaseAllureImpl implements TestCase {
+public class AllureTestCase implements TestCase {
 
     private TestCaseResult testCaseResult;
     private static String TEST_CASE_ID_LABEL = "testId";
 
-    public TestCaseAllureImpl(TestCaseResult testCaseResult){
+    public AllureTestCase(TestCaseResult testCaseResult){
         this.testCaseResult=testCaseResult;
     }
 

@@ -1,9 +1,9 @@
 package lv.ctco.zephyr.util;
 
 import lv.ctco.zephyr.beans.TestCase;
-import lv.ctco.tmm.impl.TestCaseAllureImpl;
-import lv.ctco.zephyr.beans.ResultTestCase;
-import lv.ctco.zephyr.beans.ResultTestSuite;
+import lv.ctco.zephyr.beans.testcase.AllureTestCase;
+import lv.ctco.zephyr.beans.testresult.junit.JUnitResult;
+import lv.ctco.zephyr.beans.testresult.junit.JUnitResultTestSuite;
 import ru.yandex.qatools.allure.commons.AllureFileUtils;
 import ru.yandex.qatools.allure.model.TestCaseResult;
 import ru.yandex.qatools.allure.model.TestSuiteResult;
@@ -26,16 +26,16 @@ public class Utils {
         System.out.println("##### " + msg);
     }
 
-    public static ResultTestSuite readCucumberReport(String path) throws Exception {
-        JAXBContext jaxbContext = JAXBContext.newInstance(ResultTestSuite.class);
-        return (ResultTestSuite) jaxbContext.createUnmarshaller().unmarshal(resolveFile(path));
+    public static JUnitResultTestSuite readCucumberReport(String path) throws Exception {
+        JAXBContext jaxbContext = JAXBContext.newInstance(JUnitResultTestSuite.class);
+        return (JUnitResultTestSuite) jaxbContext.createUnmarshaller().unmarshal(resolveFile(path));
     }
 
     public static List<TestCase> readAllureReport(File... directories) throws IOException {
         List<TestCase> testCases = new ArrayList<TestCase>();
         for (TestSuiteResult currentTestSuiteResult:AllureFileUtils.unmarshalSuites(directories)){
             for (TestCaseResult currentTestCaseResult : currentTestSuiteResult.getTestCases()) {
-                testCases.add(new TestCaseAllureImpl(currentTestCaseResult));
+                testCases.add(new AllureTestCase(currentTestCaseResult));
             }
         }
         return testCases;
@@ -59,7 +59,7 @@ public class Utils {
         return Paths.get(resource.toURI().resolve(path)).toFile();
     }
 
-    public static String generateJiraKey(ResultTestCase testCase) {
+    public static String generateJiraKey(JUnitResult testCase) {
         return String.join("-", normalizeKey(testCase.getClassname()), normalizeKey(testCase.getName()));
     }
 

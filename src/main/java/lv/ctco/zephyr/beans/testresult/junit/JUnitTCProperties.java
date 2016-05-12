@@ -1,4 +1,4 @@
-package lv.ctco.zephyr.beans;
+package lv.ctco.zephyr.beans.testresult.junit;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -13,7 +13,7 @@ import java.util.List;
 @XmlType(name = "", propOrder = {
         "property"
 })
-public class ResultTestCaseProperties {
+public class JUnitTCProperties {
 
     protected List<Property> property;
 
