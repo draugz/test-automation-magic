@@ -18,6 +18,7 @@ import lv.ctco.zephyr.util.HttpUtils;
 import lv.ctco.zephyr.util.Utils;
 import org.apache.http.HttpResponse;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -214,7 +215,7 @@ public class Runner {
     private static Map<String, Execution> fetchAllExecutions() throws Exception {
         log("Fetching JIRA Test Executions for the project");
         String search = "project='" + getValue(PROJECT_KEY) + "'%20and%20fixVersion='"
-                + getValue(RELEASE_VERSION) + "'%20and%20cycleName='" + getValue(TEST_CYCLE) + "'";
+                + URLEncoder.encode(getValue(RELEASE_VERSION), "UTF-8") + "'%20and%20cycleName='" + getValue(TEST_CYCLE) + "'";
 
         ExecutionResponse executionResponse = searchInZQL(search, SKIP);
         if (executionResponse == null || executionResponse.getExecutions().size() == 0) return null;
