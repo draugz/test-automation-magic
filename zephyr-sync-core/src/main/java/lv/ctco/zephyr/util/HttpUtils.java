@@ -1,7 +1,6 @@
 package lv.ctco.zephyr.util;
 
 import com.google.gson.Gson;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -14,6 +13,7 @@ import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Base64;
 
 import static lv.ctco.zephyr.Config.getValue;
 import static lv.ctco.zephyr.enums.ConfigProperty.JIRA_URL;
@@ -40,7 +40,7 @@ public class HttpUtils {
 
     private static String getAuthString() throws IOException, URISyntaxException {
         String auth = String.format("%s:%s", getValue(USERNAME), getValue(PASSWORD));
-        byte[] bytesEncoded = Base64.encodeBase64(auth.getBytes());
+        byte[] bytesEncoded = Base64.getEncoder().encode(auth.getBytes());
         return new String(bytesEncoded);
     }
 
