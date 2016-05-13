@@ -54,10 +54,10 @@ public class Runner {
         loadConfigProperties(args);
 
         List<TestCase> testCases = resolveTestCases(getValue(REPORT_PATH));
-        if (testCases == null || testCases.size() == 0) return;
+        if (testCases == null || testCases.size() == 0) throw new RuntimeException("No Test Cases extracted from the Test Report");
 
         List<Issue> issues = fetchTestIssues();
-        if (issues == null) throw new RuntimeException("Unable to fetch JIRA issues");
+        if (issues == null) throw new RuntimeException("Unable to fetch JIRA test issues");
 
         mapToIssues(testCases, issues);
 

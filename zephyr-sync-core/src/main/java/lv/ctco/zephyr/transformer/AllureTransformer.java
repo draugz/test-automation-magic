@@ -75,6 +75,6 @@ public class AllureTransformer {
             }
 
         }
-        return TestLevel.MINOR;
+        return null;
     }
 }

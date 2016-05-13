@@ -1,6 +1,5 @@
 package lv.ctco.zephyr.util;
 
-import lv.ctco.zephyr.beans.testresult.junit.JUnitResult;
 import lv.ctco.zephyr.beans.testresult.junit.JUnitResultTestSuite;
 import ru.yandex.qatools.allure.commons.AllureFileUtils;
 import ru.yandex.qatools.allure.model.TestSuiteResult;
@@ -14,6 +13,8 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
+
 public class Utils {
 
     public static void log(String msg) {
@@ -26,7 +27,12 @@ public class Utils {
     }
 
     public static List<TestSuiteResult> readAllureReport(String path) throws IOException, URISyntaxException {
-        return AllureFileUtils.unmarshalSuites(new File(path));
+        File file = new File(path);
+        if (file.isDirectory()) {
+            return AllureFileUtils.unmarshalSuites(file);
+        } else {
+            return singletonList(AllureFileUtils.unmarshal(file));
+        }
     }
 
     public static String readInputStream(InputStream is) throws IOException {
@@ -40,10 +46,6 @@ public class Utils {
         }
         br.close();
         return response.toString();
-    }
-
-    public static String generateJiraKey(JUnitResult testCase) {
-        return String.join("-", normalizeKey(testCase.getClassname()), normalizeKey(testCase.getName()));
     }
 
     public static String normalizeKey(String input) {
