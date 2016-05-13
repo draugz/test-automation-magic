@@ -28,7 +28,9 @@ public class HttpUtils {
 
     public static HttpResponse get(String url) throws Exception {
         CloseableHttpClient httpClient = getHttpClient();
-        HttpGet request = new HttpGet(getValue(JIRA_URL) + url);
+        String uri = getValue(JIRA_URL) + url;
+        Utils.log("GET: " + uri);
+        HttpGet request = new HttpGet(uri);
         setCommonHeaders(request);
         return httpClient.execute(request);
     }
@@ -53,7 +55,9 @@ public class HttpUtils {
         String json = new Gson().toJson(entity);
 
         CloseableHttpClient httpClient = getHttpClient();
-        HttpPost request = new HttpPost(getValue(JIRA_URL) + url);
+        String uri = getValue(JIRA_URL) + url;
+        Utils.log("POST: " + uri);
+        HttpPost request = new HttpPost(uri);
         setCommonHeaders(request);
         request.setHeader("Content-Type", "application/json");
         request.setEntity(new StringEntity(json));
@@ -64,7 +68,9 @@ public class HttpUtils {
         String json = new Gson().toJson(entity);
 
         CloseableHttpClient httpClient = getHttpClient();
-        HttpPut request = new HttpPut(getValue(JIRA_URL) + url);
+        String uri = getValue(JIRA_URL) + url;
+        Utils.log("PUT: " + uri);
+        HttpPut request = new HttpPut(uri);
         setCommonHeaders(request);
         request.setHeader("Content-Type", "application/json");
         request.setEntity(new StringEntity(json));
