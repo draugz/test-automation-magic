@@ -1,4 +1,3 @@
 #IDE specific files
 .idea
 **/*.iml
-src/main/resources/config.properties
