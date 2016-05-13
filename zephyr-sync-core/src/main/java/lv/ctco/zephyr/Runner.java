@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import static lv.ctco.zephyr.Config.getValue;
+import static lv.ctco.zephyr.Config.loadConfigProperties;
 import static lv.ctco.zephyr.enums.ConfigProperty.PROJECT_KEY;
 import static lv.ctco.zephyr.enums.ConfigProperty.RELEASE_VERSION;
 import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_PATH;
@@ -37,8 +38,8 @@ import static lv.ctco.zephyr.util.HttpTransformer.deserialize;
 import static lv.ctco.zephyr.util.HttpUtils.getAndReturnBody;
 import static lv.ctco.zephyr.util.Utils.log;
 import static lv.ctco.zephyr.util.Utils.readAllureReport;
-import static lv.ctco.zephyr.util.Utils.readJUnitReport;
 import static lv.ctco.zephyr.util.Utils.readInputStream;
+import static lv.ctco.zephyr.util.Utils.readJUnitReport;
 
 public class Runner {
 
@@ -50,6 +51,8 @@ public class Runner {
     public static String cycleId;
 
     public static void main(String[] args) throws Exception {
+        loadConfigProperties(args);
+
         List<TestCase> testCases = resolveTestCases(getValue(REPORT_PATH));
         if (testCases == null || testCases.size() == 0) return;
 
@@ -132,6 +135,7 @@ public class Runner {
     }
 
     private static void createTestIssue(TestCase testCase) throws Exception {
+        log("Creating JIRA test issue with Unique ID " + testCase.getUniqueId());
         Issue issue = new Issue();
         Fields fields = issue.getFields();
         fields.setSummary(testCase.getName());
@@ -145,13 +149,17 @@ public class Runner {
         issueType.setName(TEST.getName());
         fields.setIssuetype(issueType);
 
-        Metafield priority = new Metafield();
-        priority.setName(testCase.getPriority().getName());
-        fields.setPriority(priority);
+        if (testCase.getPriority() != null) {
+            Metafield priority = new Metafield();
+            priority.setName(testCase.getPriority().getName());
+            fields.setPriority(priority);
+        }
 
-        Metafield severity = new Metafield();
-        severity.setId(testCase.getSeverity().getIndex().toString());
-        fields.setSeverity(severity);
+        if (testCase.getSeverity() != null) {
+            Metafield severity = new Metafield();
+            severity.setId(testCase.getSeverity().getIndex().toString());
+            fields.setSeverity(severity);
+        }
 
         List<Metafield> versions = new ArrayList<Metafield>(1);
         Metafield version = new Metafield();

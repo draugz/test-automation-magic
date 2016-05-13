@@ -1,7 +1,6 @@
 package lv.ctco.zephyr.util;
 
 import com.google.gson.Gson;
-import lv.ctco.zephyr.Config;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -11,6 +10,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -22,8 +22,12 @@ import static lv.ctco.zephyr.enums.ConfigProperty.USERNAME;
 
 public class HttpUtils {
 
+    public static CloseableHttpClient getHttpClient() throws Exception {
+        return HttpClients.createDefault();
+    }
+
     public static HttpResponse get(String url) throws Exception {
-        CloseableHttpClient httpClient = Config.getHttpClient();
+        CloseableHttpClient httpClient = getHttpClient();
         HttpGet request = new HttpGet(getValue(JIRA_URL) + url);
         setCommonHeaders(request);
         return httpClient.execute(request);
@@ -48,19 +52,18 @@ public class HttpUtils {
     public static HttpResponse post(String url, Object entity) throws Exception {
         String json = new Gson().toJson(entity);
 
-        CloseableHttpClient httpClient = Config.getHttpClient();
+        CloseableHttpClient httpClient = getHttpClient();
         HttpPost request = new HttpPost(getValue(JIRA_URL) + url);
         setCommonHeaders(request);
         request.setHeader("Content-Type", "application/json");
         request.setEntity(new StringEntity(json));
-        CloseableHttpResponse response = httpClient.execute(request);
-        return response;
+        return httpClient.execute(request);
     }
 
     public static HttpResponse put(String url, Object entity) throws Exception {
         String json = new Gson().toJson(entity);
 
-        CloseableHttpClient httpClient = Config.getHttpClient();
+        CloseableHttpClient httpClient = getHttpClient();
         HttpPut request = new HttpPut(getValue(JIRA_URL) + url);
         setCommonHeaders(request);
         request.setHeader("Content-Type", "application/json");

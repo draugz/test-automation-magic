@@ -1,22 +1,31 @@
 package lv.ctco.zephyr.enums;
 
 public enum ConfigProperty {
-    REPORT_PATH("report.path"),
-    REPORT_TYPE("report.type"),
-    JIRA_URL("jira.base.path"),
-    PROJECT_KEY("jira.project.key"),
-    RELEASE_VERSION("jira.release.version"),
-    TEST_CYCLE("jira.test.cycle"),
-    USERNAME("auth.username"),
-    PASSWORD("auth.password");
+    USERNAME(0),
+    PASSWORD(1),
+    REPORT_TYPE(2),
+    PROJECT_KEY(3),
+    RELEASE_VERSION(4),
+    TEST_CYCLE(5),
+    JIRA_URL(6),
+    REPORT_PATH(7);
 
-    private String name;
+    private int id;
 
-    ConfigProperty(String name) {
-        this.name = name;
+    ConfigProperty(int id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public int getId() {
+        return id;
+    }
+
+    public static ConfigProperty findById(int id) {
+        for (ConfigProperty property : values()) {
+            if (property.getId() == id) {
+                return property;
+            }
+        }
+        throw new RuntimeException("Unsupported parameter is passed");
     }
 }
