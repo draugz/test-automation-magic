@@ -14,6 +14,8 @@ import lv.ctco.zephyr.beans.zapi.ExecutionRequest;
 import lv.ctco.zephyr.beans.zapi.ExecutionResponse;
 import lv.ctco.zephyr.enums.ReportType;
 import lv.ctco.zephyr.enums.TestStatus;
+import lv.ctco.zephyr.transformer.AllureTransformer;
+import lv.ctco.zephyr.transformer.JUnitTransformer;
 import lv.ctco.zephyr.util.HttpUtils;
 import lv.ctco.zephyr.util.Utils;
 import org.apache.http.HttpResponse;
@@ -33,7 +35,6 @@ import static lv.ctco.zephyr.enums.ConfigProperty.TEST_CYCLE;
 import static lv.ctco.zephyr.enums.IssueType.TEST;
 import static lv.ctco.zephyr.util.HttpTransformer.deserialize;
 import static lv.ctco.zephyr.util.HttpUtils.getAndReturnBody;
-import static lv.ctco.zephyr.util.ReportTransformer.transform;
 import static lv.ctco.zephyr.util.Utils.log;
 import static lv.ctco.zephyr.util.Utils.readAllureReport;
 import static lv.ctco.zephyr.util.Utils.readJUnitReport;
@@ -296,9 +297,9 @@ public class Runner {
 
         switch (type) {
             case JUNIT:
-                return transform(readJUnitReport(path));
+                return JUnitTransformer.transform(readJUnitReport(path));
             case ALLURE:
-                return transform(readAllureReport(path));
+                return AllureTransformer.transform(readAllureReport(path));
             default:
                 return null;
         }
