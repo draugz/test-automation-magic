@@ -1,7 +1,6 @@
 package lv.ctco.zephyr.util;
 
 import com.google.gson.Gson;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -14,6 +13,7 @@ import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Base64;
 
 import static lv.ctco.zephyr.Config.getValue;
 import static lv.ctco.zephyr.enums.ConfigProperty.JIRA_URL;
@@ -28,7 +28,9 @@ public class HttpUtils {
 
     public static HttpResponse get(String url) throws Exception {
         CloseableHttpClient httpClient = getHttpClient();
-        HttpGet request = new HttpGet(getValue(JIRA_URL) + url);
+        String uri = getValue(JIRA_URL) + url;
+        Utils.log("GET: " + uri);
+        HttpGet request = new HttpGet(uri);
         setCommonHeaders(request);
         return httpClient.execute(request);
     }
@@ -40,7 +42,7 @@ public class HttpUtils {
 
     private static String getAuthString() throws IOException, URISyntaxException {
         String auth = String.format("%s:%s", getValue(USERNAME), getValue(PASSWORD));
-        byte[] bytesEncoded = Base64.encodeBase64(auth.getBytes());
+        byte[] bytesEncoded = Base64.getEncoder().encode(auth.getBytes());
         return new String(bytesEncoded);
     }
 
@@ -53,7 +55,9 @@ public class HttpUtils {
         String json = new Gson().toJson(entity);
 
         CloseableHttpClient httpClient = getHttpClient();
-        HttpPost request = new HttpPost(getValue(JIRA_URL) + url);
+        String uri = getValue(JIRA_URL) + url;
+        Utils.log("POST: " + uri);
+        HttpPost request = new HttpPost(uri);
         setCommonHeaders(request);
         request.setHeader("Content-Type", "application/json");
         request.setEntity(new StringEntity(json));
@@ -64,7 +68,9 @@ public class HttpUtils {
         String json = new Gson().toJson(entity);
 
         CloseableHttpClient httpClient = getHttpClient();
-        HttpPut request = new HttpPut(getValue(JIRA_URL) + url);
+        String uri = getValue(JIRA_URL) + url;
+        Utils.log("PUT: " + uri);
+        HttpPut request = new HttpPut(uri);
         setCommonHeaders(request);
         request.setHeader("Content-Type", "application/json");
         request.setEntity(new StringEntity(json));

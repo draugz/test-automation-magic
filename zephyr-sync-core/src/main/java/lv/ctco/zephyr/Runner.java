@@ -43,7 +43,7 @@ import static lv.ctco.zephyr.util.Utils.readJUnitReport;
 
 public class Runner {
 
-    public static int TOP = 100;
+    public static int TOP = 20;
     public static int SKIP = 0;
 
     public static String projectId;
@@ -247,7 +247,7 @@ public class Runner {
     }
 
     private static ExecutionResponse searchInZQL(String search, int skip) throws Exception {
-        String response = getAndReturnBody("zapi/latest/zql/executeSearch?zqlQuery=" + search + "&maxResults=" + TOP + "&startAt=" + skip);
+        String response = getAndReturnBody("zapi/latest/zql/executeSearch?zqlQuery=" + search + "&offset=" + skip);
         return deserialize(response, ExecutionResponse.class);
     }
 
