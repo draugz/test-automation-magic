@@ -9,6 +9,7 @@ import lv.ctco.zephyr.enums.TestStatus;
 import lv.ctco.zephyr.util.ObjectTransformer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static lv.ctco.zephyr.util.Utils.normalizeKey;
@@ -22,9 +23,13 @@ public class CucumberTransformer extends ObjectTransformer {
         for (Feature feature : features) {
             for (Scenario scenario : feature.getScenarios()) {
                 TestCase test = new TestCase();
+                List<String> jiraKeys = resolveJiraKeys(scenario, "@TestCaseId=");
+                if (jiraKeys != null && jiraKeys.size() == 1) {
+                    test.setKey(jiraKeys.get(0));
+                }
                 test.setName(scenario.getName());
                 test.setUniqueId(generateUniqueId(feature, scenario));
-                test.setStoryKeys(resolveStoryKeys(scenario));
+                test.setStoryKeys(resolveJiraKeys(scenario, "@Story="));
                 test.setStatus(resolveStatus(scenario));
                 testCases.add(test);
             }
@@ -45,7 +50,7 @@ public class CucumberTransformer extends ObjectTransformer {
         return TestStatus.PASSED;
     }
 
-    private static List<String> resolveStoryKeys(Scenario scenario) {
+    private static List<String> resolveJiraKeys(Scenario scenario, String tagPrefix) {
         Tag[] tags = scenario.getTags();
         if (tags == null || tags.length == 0) return null;
 
@@ -53,9 +58,9 @@ public class CucumberTransformer extends ObjectTransformer {
         for (Tag tag : tags) {
             String tagName = tag.getName();
 
-            String prefix = "@Story=";
-            if (tagName.toLowerCase().startsWith(prefix.toLowerCase())) {
-                result.add(tagName.substring(prefix.length()).trim());
+            if (tagName.toLowerCase().startsWith(tagPrefix.toLowerCase())) {
+                String[] keys = tagName.substring(tagPrefix.length()).trim().split(",");
+                Collections.addAll(result, keys);
             }
         }
         return result.size() != 0 ? result : null;
