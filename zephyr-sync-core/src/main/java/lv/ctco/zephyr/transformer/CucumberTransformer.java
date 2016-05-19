@@ -54,7 +54,7 @@ public class CucumberTransformer extends ObjectTransformer {
             String tagName = tag.getName();
 
             String prefix = "@Story=";
-            if (tagName.startsWith(prefix)) {
+            if (tagName.toLowerCase().startsWith(prefix.toLowerCase())) {
                 result.add(tagName.substring(prefix.length()).trim());
             }
         }
