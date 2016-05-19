@@ -3,23 +3,18 @@ package lv.ctco.zephyr.beans.testcase;
 import lv.ctco.zephyr.beans.TestCase;
 import lv.ctco.zephyr.enums.TestLevel;
 import lv.ctco.zephyr.enums.TestStatus;
-import ru.yandex.qatools.allure.model.Label;
-import ru.yandex.qatools.allure.model.SeverityLevel;
-import ru.yandex.qatools.allure.model.TestCaseResult;
-
-import java.util.List;
 
 import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
 
 public class AllureTestCase implements TestCase {
 
-    private TestLevel priority = TestLevel.MEDIUM;
     private Integer id;
     private String key;
     private String uniqueId;
     private String name;
     private TestStatus status = NOT_EXECUTED;
     private TestLevel severity;
+    private TestLevel priority = TestLevel.MEDIUM;
 
 
     public TestStatus getStatus() {

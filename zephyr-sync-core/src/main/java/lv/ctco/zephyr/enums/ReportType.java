@@ -2,6 +2,7 @@ package lv.ctco.zephyr.enums;
 
 public enum ReportType {
     JUNIT("junit"),
+    CUCUMBER("cucumber"),
     ALLURE("allure");
 
     private String name;

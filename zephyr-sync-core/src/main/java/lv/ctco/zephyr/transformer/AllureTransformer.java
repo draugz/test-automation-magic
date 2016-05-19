@@ -29,14 +29,8 @@ public class AllureTransformer {
         return testCases;
     }
 
-    private static String getUniqueIdFromAllureTestCase(TestCaseResult testCaseResult) {
-        List<Label> labels = testCaseResult.getLabels();
-        for (Label currentLabel : labels) {
-            if (currentLabel.getName().equals("testId") && !currentLabel.getValue().isEmpty()) {
-                return currentLabel.getValue();
-            }
-        }
-        return null;
+    private static String generateUniqueId(TestCaseResult testCaseResult) {
+        return testCaseResult.getName();
     }
 
     private static TestStatus getStatusFromAllureTestCase(TestCaseResult testCaseResult) {

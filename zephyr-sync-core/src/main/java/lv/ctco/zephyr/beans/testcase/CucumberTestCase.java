@@ -6,7 +6,7 @@ import lv.ctco.zephyr.enums.TestStatus;
 
 import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
 
-public class JUnitTestCase implements TestCase {
+public class CucumberTestCase implements TestCase {
 
     private Integer id;
     private String key;

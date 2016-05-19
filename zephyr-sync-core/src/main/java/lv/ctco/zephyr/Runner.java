@@ -15,6 +15,7 @@ import lv.ctco.zephyr.beans.zapi.ExecutionResponse;
 import lv.ctco.zephyr.enums.ReportType;
 import lv.ctco.zephyr.enums.TestStatus;
 import lv.ctco.zephyr.transformer.AllureTransformer;
+import lv.ctco.zephyr.transformer.CucumberTransformer;
 import lv.ctco.zephyr.transformer.JUnitTransformer;
 import lv.ctco.zephyr.util.HttpUtils;
 import lv.ctco.zephyr.util.Utils;
@@ -34,10 +35,11 @@ import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_PATH;
 import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_TYPE;
 import static lv.ctco.zephyr.enums.ConfigProperty.TEST_CYCLE;
 import static lv.ctco.zephyr.enums.IssueType.TEST;
-import static lv.ctco.zephyr.util.HttpTransformer.deserialize;
+import static lv.ctco.zephyr.util.ObjectTransformer.deserialize;
 import static lv.ctco.zephyr.util.HttpUtils.getAndReturnBody;
 import static lv.ctco.zephyr.util.Utils.log;
 import static lv.ctco.zephyr.util.Utils.readAllureReport;
+import static lv.ctco.zephyr.util.Utils.readCucumberReport;
 import static lv.ctco.zephyr.util.Utils.readInputStream;
 import static lv.ctco.zephyr.util.Utils.readJUnitReport;
 
@@ -306,6 +308,8 @@ public class Runner {
         switch (type) {
             case JUNIT:
                 return JUnitTransformer.transform(readJUnitReport(path));
+            case CUCUMBER:
+                return CucumberTransformer.transform(readCucumberReport(path));
             case ALLURE:
                 return AllureTransformer.transform(readAllureReport(path));
             default:

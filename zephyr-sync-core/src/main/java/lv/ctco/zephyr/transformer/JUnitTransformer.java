@@ -22,14 +22,14 @@ public class JUnitTransformer {
         for (JUnitResult testCase : resultTestSuite.getTestcase()) {
             TestCase test = new JUnitTestCase();
             test.setName(testCase.getName());
-            test.setUniqueId(getUniqueIdFromJUnitTestCase(testCase));
+            test.setUniqueId(generateUniqueId(testCase));
             test.setStatus(testCase.getError() != null || testCase.getFailure() != null ? TestStatus.FAILED : TestStatus.PASSED);
             result.add(test);
         }
         return result;
     }
 
-    public static String getUniqueIdFromJUnitTestCase(JUnitResult testCase) {
+    public static String generateUniqueId(JUnitResult testCase) {
         return String.join("-", normalizeKey(testCase.getClassname()), normalizeKey(testCase.getName()));
     }
 }
