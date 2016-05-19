@@ -45,12 +45,12 @@ import static lv.ctco.zephyr.util.Utils.readJUnitReport;
 
 public class Runner {
 
-    public static int TOP = 20;
-    public static int SKIP = 0;
+    private static int TOP = 20;
+    private static int SKIP = 0;
 
-    public static String projectId;
-    public static String versionId;
-    public static String cycleId;
+    private static String projectId;
+    private static String versionId;
+    private static String cycleId;
 
     public static void main(String[] args) throws Exception {
         loadConfigProperties(args);
@@ -121,18 +121,36 @@ public class Runner {
     private static void mapToIssues(List<TestCase> resultTestCases, List<Issue> issues) {
         Map<String, Issue> uniqueKeyMap = new HashMap<String, Issue>(issues.size());
         for (Issue issue : issues) {
+            uniqueKeyMap.put(issue.getKey(), issue);
             String environment = issue.getFields().getEnvironment();
             if (environment != null) {
                 uniqueKeyMap.put(environment, issue);
             }
         }
 
-        for (TestCase testCase : resultTestCases) {
-            Issue issue = uniqueKeyMap.get(testCase.getUniqueId());
-            if (issue == null) continue;
+        /*
+        * Dobavil v map esho Jira Key kak kljuch
+        * esli u TC est uzhe kakojto Key iz reporta, to ishem po mapu.
+        * Vrode dolzhno rabotat, zavtra proverju, nadejus nichego ne slomal:)
+        *
+        * */
 
-            testCase.setId(issue.getId());
-            testCase.setKey(issue.getKey());
+        for (TestCase testCase : resultTestCases) {
+            if (!(testCase.getKey() == null)) {
+                if (uniqueKeyMap.containsKey(testCase.getKey())) {
+                    testCase.setId(uniqueKeyMap.get(testCase.getKey()).getId());
+                } else {
+                    log(String.format("Key: %s, is not found, new Test Case should be created", testCase.getKey()));
+                    testCase.setId(null);
+                    testCase.setKey(null);
+                }
+            } else {
+                Issue issue = uniqueKeyMap.get(testCase.getUniqueId());
+                if (issue == null) continue;
+
+                testCase.setId(issue.getId());
+                testCase.setKey(issue.getKey());
+            }
         }
     }
 
@@ -203,7 +221,8 @@ public class Runner {
     }
 
     private static String getTestCycleId() throws Exception {
-        if (projectId == null || versionId == null) throw new RuntimeException("JIRA projectID or versionID are missing");
+        if (projectId == null || versionId == null)
+            throw new RuntimeException("JIRA projectID or versionID are missing");
 
         String response = getAndReturnBody(String.format("zapi/latest/cycle?projectId=%s&versionId=%s", projectId, versionId));
         CycleList cycleList = deserialize(response, CycleList.class);

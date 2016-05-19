@@ -21,6 +21,7 @@ public class AllureTransformer {
                 currentTestCase.setName(currentTestCaseResult.getName());
                 currentTestCase.setUniqueId(generateUniqueId(currentTestCaseResult));
                 currentTestCase.setStoryKeys(getStoryKeys(currentTestCaseResult));
+                currentTestCase.setKey(getJiraKey(currentTestCaseResult));
                 currentTestCase.setStatus(getStatus(currentTestCaseResult));
                 currentTestCase.setSeverity(getSeverity(currentTestCaseResult));
                 testCases.add(currentTestCase);
@@ -81,5 +82,14 @@ public class AllureTransformer {
             }
         }
         return storyKeys;
+    }
+
+    private static String getJiraKey(TestCaseResult currentTestCaseResult) {
+        for (Label currentLabel : currentTestCaseResult.getLabels()) {
+            if (currentLabel.getName().equalsIgnoreCase("testcaseid") && !currentLabel.getValue().isEmpty()) {
+                return currentLabel.getValue();
+            }
+        }
+        return null;
     }
 }
