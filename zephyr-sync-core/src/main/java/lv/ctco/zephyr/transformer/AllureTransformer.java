@@ -46,11 +46,11 @@ public class AllureTransformer {
         }
     }
 
-    private static TestLevel getSeverity(TestCaseResult testCaseResult) {
+    private static TestLevel getSeverity(TestCaseResult currentTestCaseResult) {
         String severity = "";
 
-        for (Label currentLabel : testCaseResult.getLabels()) {
-            if (currentLabel.getName().equals("severity") && !currentLabel.getValue().isEmpty()) {
+        for (Label currentLabel : currentTestCaseResult.getLabels()) {
+            if (currentLabel.getName().equalsIgnoreCase("severity") && !currentLabel.getValue().isEmpty()) {
                 severity = currentLabel.getValue();
             }
         }
@@ -73,6 +73,13 @@ public class AllureTransformer {
     }
 
     private static List<String> getStoryKeys(TestCaseResult currentTestCaseResult) {
-        return null;
+        List<String> storyKeys = new ArrayList<String>();
+
+        for (Label currentLabel : currentTestCaseResult.getLabels()) {
+            if (currentLabel.getName().equalsIgnoreCase("storyId") && !currentLabel.getValue().isEmpty()) {
+                storyKeys.add(currentLabel.getValue());
+            }
+        }
+        return storyKeys;
     }
 }
