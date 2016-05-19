@@ -3,33 +3,71 @@ package lv.ctco.zephyr.beans;
 import lv.ctco.zephyr.enums.TestLevel;
 import lv.ctco.zephyr.enums.TestStatus;
 
-public interface TestCase {
+import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
 
-    Integer getId();
+public class TestCase {
 
-    void setId(Integer id);
+    private Integer id;
+    private String key;
+    private String uniqueId;
+    private String name;
+    private TestStatus status = NOT_EXECUTED;
+    private TestLevel severity;
+    private TestLevel priority = TestLevel.MEDIUM;
 
-    TestStatus getStatus();
+    public Integer getId() {
+        return id;
+    }
 
-    void setStatus(TestStatus status);
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-    String getUniqueId();
+    public String getKey() {
+        return key;
+    }
 
-    void setUniqueId(String uniqueId);
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-    String getKey();
+    public String getUniqueId() {
+        return uniqueId;
+    }
 
-    void setKey(String key);
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
 
-    TestLevel getSeverity();
+    public String getName() {
+        return name;
+    }
 
-    void setSeverity(TestLevel severity);
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    String getName();
+    public TestStatus getStatus() {
+        return status;
+    }
 
-    void setName(String name);
+    public void setStatus(TestStatus status) {
+        this.status = status;
+    }
 
-    TestLevel getPriority();
+    public TestLevel getSeverity() {
+        return severity;
+    }
 
-    void setPriority(TestLevel priority);
+    public void setSeverity(TestLevel severity) {
+        this.severity = severity;
+    }
+
+    public TestLevel getPriority() {
+        return priority;
+    }
+
+    public void setPriority(TestLevel priority) {
+        this.priority = priority;
+    }
 }

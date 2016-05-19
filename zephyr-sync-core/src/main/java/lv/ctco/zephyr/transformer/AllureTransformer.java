@@ -1,7 +1,6 @@
 package lv.ctco.zephyr.transformer;
 
 import lv.ctco.zephyr.beans.TestCase;
-import lv.ctco.zephyr.beans.testcase.AllureTestCase;
 import lv.ctco.zephyr.enums.TestLevel;
 import lv.ctco.zephyr.enums.TestStatus;
 import ru.yandex.qatools.allure.model.Label;
@@ -18,7 +17,7 @@ public class AllureTransformer {
         List<TestCase> testCases = new ArrayList<TestCase>();
         for (TestSuiteResult currentTestSuiteResult : result) {
             for (TestCaseResult currentTestCaseResult : currentTestSuiteResult.getTestCases()) {
-                TestCase currentTestCase = new AllureTestCase();
+                TestCase currentTestCase = new TestCase();
                 currentTestCase.setName(currentTestCaseResult.getName());
                 currentTestCase.setUniqueId(currentTestCaseResult.getName());
                 currentTestCase.setStatus(getStatusFromAllureTestCase(currentTestCaseResult));

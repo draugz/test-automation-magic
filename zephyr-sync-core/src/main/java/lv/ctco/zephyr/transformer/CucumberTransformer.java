@@ -1,7 +1,6 @@
 package lv.ctco.zephyr.transformer;
 
 import lv.ctco.zephyr.beans.TestCase;
-import lv.ctco.zephyr.beans.testcase.CucumberTestCase;
 import lv.ctco.zephyr.beans.testresult.cucumber.CucumberResult;
 import lv.ctco.zephyr.beans.testresult.cucumber.Element;
 import lv.ctco.zephyr.beans.testresult.cucumber.Step;
@@ -21,7 +20,7 @@ public class CucumberTransformer extends ObjectTransformer {
 
         for (CucumberResult feature : features) {
             for (Element scenario : feature.getElements()) {
-                TestCase test = new CucumberTestCase();
+                TestCase test = new TestCase();
                 test.setName(scenario.getName());
                 test.setUniqueId(generateUniqueId(feature, scenario));
                 test.setStatus(resolveStatus(scenario));
