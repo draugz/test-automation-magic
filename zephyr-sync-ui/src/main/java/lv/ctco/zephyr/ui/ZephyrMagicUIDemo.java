@@ -1,55 +1,53 @@
 package lv.ctco.zephyr.ui;
 
-import com.sun.xml.internal.bind.v2.model.runtime.RuntimeNonElementRef;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 public class ZephyrMagicUIDemo extends Application {
+
+    private static final String ERROR_STYLE = "error-massage";
+    private static final String TITLE = "Test Automation Magic";
+    private static final String CSS_CLASS="controlStyle.css";
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    private Label lblSelectReportType=new Label("Please select report type:");
-    private RadioButton rbtAllureReport=new RadioButton("Allure");
-    private RadioButton rbtJunitReport=new RadioButton("JUnit");
+    private Label lblSelectReportType = new Label("Please select report type:");
+    private RadioButton rbtAllureReport = new RadioButton("Allure");
+    private RadioButton rbtJunitReport = new RadioButton("JUnit");
+    private ToggleGroup toggleGroup = new ToggleGroup();
 
-    private Label provideJiraUrl=new Label("Please provide JIRA URL:");
-    private TextField txtJiraUrl=new TextField("http://swissre.com");
+    private Label lblProvideJiraUrl = new Label("Please provide JIRA URL:");
+    private TextField txtJiraUrl = new TextField("http://swissre.com");
 
-    private Label provideReportPath=new Label("Please provide path for report directory:");
-    private TextField txtReportPath=new TextField();
+    private Label lblProvideReportPath = new Label("Please provide path for report directory:");
+    private TextField txtReportPath = new TextField();
 
-    private Label lblLogin=new Label("Login:");
-    private TextField txtLogin=new TextField();
+    private Label lblLogin = new Label("Login:");
+    private TextField txtLogin = new TextField();
 
-    private Label lblPassword=new Label("Password:");
-    private PasswordField pswPassword=new PasswordField();
+    private Label lblPassword = new Label("Password:");
+    private PasswordField pswPassword = new PasswordField();
 
-    private Button btnUpdateJira=new Button("Update Jira");
+    private Button btnUpdateJira = new Button("Update Jira");
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Test Automation Magic");
+        stage.setTitle(TITLE);
         GridPane root = new GridPane();
         Scene scene = new Scene(root, 600, 350, Color.LIGHTGRAY);
         stage.setScene(scene);
+        scene.getStylesheets().add(CSS_CLASS);
 
         VBox mainInformationBar = new VBox(5);
         mainInformationBar.setPadding(new Insets(5, 10, 50, 10));
@@ -76,14 +74,18 @@ public class ZephyrMagicUIDemo extends Application {
         mainInformationBar.getChildren().add(passwordBar);
 
         reportTypeBar.getChildren().add(lblSelectReportType);
+        rbtAllureReport.setToggleGroup(toggleGroup);
+        rbtJunitReport.setToggleGroup(toggleGroup);
+
         reportTypeBar.getChildren().add(rbtAllureReport);
         reportTypeBar.getChildren().add(rbtJunitReport);
+        rbtAllureReport.setSelected(true);
 
-        jiraUrlBar.getChildren().add(provideJiraUrl);
+        jiraUrlBar.getChildren().add(lblProvideJiraUrl);
         txtJiraUrl.setPrefWidth(300);
         jiraUrlBar.getChildren().add(txtJiraUrl);
 
-        reportPathBar.getChildren().add(provideReportPath);
+        reportPathBar.getChildren().add(lblProvideReportPath);
         txtReportPath.setPrefWidth(218);
         reportPathBar.getChildren().add(txtReportPath);
 
@@ -95,18 +97,48 @@ public class ZephyrMagicUIDemo extends Application {
 
         btnUpdateJira.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
+                verifyMandatoryFields();
+
+//                String[] parametrs = new String[5];
+//                parametrs[0] = "546";
+//                try {
+//                    lv.ctco.zephyr.Runner.main(parametrs);
+//                } catch (Exception e1) {
+//                    e1.printStackTrace();
+//                }
 
             }
         });
         mainInformationBar.getChildren().add(btnUpdateJira);
-
         stage.show();
 
     }
 
-    public void verifyMandatoryFields(){
-        if (!rbtAllureReport.isSelected()&&!rbtJunitReport.isSelected()){
-            System.out.print("Please provide mandatory information");
+    public void verifyMandatoryFields() {
+        boolean errorShouldBeDisplayed = false;
+        if (txtJiraUrl.getText().isEmpty()) {
+            errorShouldBeDisplayed = true;
+            txtJiraUrl.getStyleClass().add(ERROR_STYLE);
         }
+        if (txtReportPath.getText().isEmpty()) {
+            errorShouldBeDisplayed = true;
+            txtReportPath.getStyleClass().add(ERROR_STYLE);
+        }
+        if (txtLogin.getText().isEmpty()) {
+            errorShouldBeDisplayed = true;
+            txtLogin.getStyleClass().add(ERROR_STYLE);
+        }
+        if (pswPassword.getText().isEmpty()) {
+            errorShouldBeDisplayed = true;
+            pswPassword.getStyleClass().add(ERROR_STYLE);
+        }
+        if (errorShouldBeDisplayed == true) {
+            pleaseFillMandatoryFieldsAllert();
+        }
+    }
+
+    public void pleaseFillMandatoryFieldsAllert() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill mandatory fields", ButtonType.YES);
+        alert.showAndWait();
     }
 }

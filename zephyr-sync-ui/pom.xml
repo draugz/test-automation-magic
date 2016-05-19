@@ -13,6 +13,10 @@
     <artifactId>zephyr-sync-ui</artifactId>
 
     <dependencies>
-
+        <dependency>
+            <groupId>lv.ctco</groupId>
+            <artifactId>zephyr-sync-master</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
