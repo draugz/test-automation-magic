@@ -1,6 +1,6 @@
 package lv.ctco.zephyr.beans.testresult.cucumber;
 
-public class Element {
+public class Scenario {
     public Before before[];
     public long line;
     public String name;
@@ -10,8 +10,9 @@ public class Element {
     public String type;
     public String keyword;
     public Step steps[];
+    public Tag tags[];
 
-    public Element() {
+    public Scenario() {
     }
 
     public Before[] getBefore() {
@@ -48,5 +49,9 @@ public class Element {
 
     public Step[] getSteps() {
         return steps;
+    }
+
+    public Tag[] getTags() {
+        return tags;
     }
 }

@@ -19,9 +19,10 @@ public class AllureTransformer {
             for (TestCaseResult currentTestCaseResult : currentTestSuiteResult.getTestCases()) {
                 TestCase currentTestCase = new TestCase();
                 currentTestCase.setName(currentTestCaseResult.getName());
-                currentTestCase.setUniqueId(currentTestCaseResult.getName());
-                currentTestCase.setStatus(getStatusFromAllureTestCase(currentTestCaseResult));
-                currentTestCase.setSeverity(getSeverityFromAllureTestCase(currentTestCaseResult));
+                currentTestCase.setUniqueId(generateUniqueId(currentTestCaseResult));
+                currentTestCase.setStoryKeys(getStoryKeys(currentTestCaseResult));
+                currentTestCase.setStatus(getStatus(currentTestCaseResult));
+                currentTestCase.setSeverity(getSeverity(currentTestCaseResult));
                 testCases.add(currentTestCase);
             }
         }
@@ -32,7 +33,7 @@ public class AllureTransformer {
         return testCaseResult.getName();
     }
 
-    private static TestStatus getStatusFromAllureTestCase(TestCaseResult testCaseResult) {
+    private static TestStatus getStatus(TestCaseResult testCaseResult) {
         switch (testCaseResult.getStatus()) {
             case FAILED:
                 return TestStatus.FAILED;
@@ -45,7 +46,7 @@ public class AllureTransformer {
         }
     }
 
-    private static TestLevel getSeverityFromAllureTestCase(TestCaseResult testCaseResult) {
+    private static TestLevel getSeverity(TestCaseResult testCaseResult) {
         String severity = "";
 
         for (Label currentLabel : testCaseResult.getLabels()) {
@@ -68,6 +69,10 @@ public class AllureTransformer {
             }
 
         }
+        return null;
+    }
+
+    private static List<String> getStoryKeys(TestCaseResult currentTestCaseResult) {
         return null;
     }
 }

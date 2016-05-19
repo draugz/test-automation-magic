@@ -3,6 +3,8 @@ package lv.ctco.zephyr.beans;
 import lv.ctco.zephyr.enums.TestLevel;
 import lv.ctco.zephyr.enums.TestStatus;
 
+import java.util.List;
+
 import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
 
 public class TestCase {
@@ -11,6 +13,7 @@ public class TestCase {
     private String key;
     private String uniqueId;
     private String name;
+    private List<String> storyKeys;
     private TestStatus status = NOT_EXECUTED;
     private TestLevel severity;
     private TestLevel priority = TestLevel.MEDIUM;
@@ -53,6 +56,14 @@ public class TestCase {
 
     public void setStatus(TestStatus status) {
         this.status = status;
+    }
+
+    public List<String> getStoryKeys() {
+        return storyKeys;
+    }
+
+    public void setStoryKeys(List<String> storyKeys) {
+        this.storyKeys = storyKeys;
     }
 
     public TestLevel getSeverity() {

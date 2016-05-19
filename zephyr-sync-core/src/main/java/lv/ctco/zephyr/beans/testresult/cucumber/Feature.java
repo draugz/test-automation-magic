@@ -1,22 +1,22 @@
 package lv.ctco.zephyr.beans.testresult.cucumber;
 
-public class CucumberResult {
+public class Feature {
     public long line;
-    public Element elements[];
+    public Scenario elements[];
     public String name;
     public String description;
     public String id;
     public String keyword;
     public String uri;
 
-    public CucumberResult() {
+    public Feature() {
     }
 
     public long getLine() {
         return line;
     }
 
-    public Element[] getElements() {
+    public Scenario[] getScenarios() {
         return elements;
     }
 
