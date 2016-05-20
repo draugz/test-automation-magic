@@ -160,6 +160,7 @@ public class Runner {
         Fields fields = issue.getFields();
         fields.setSummary(testCase.getName());
         fields.setEnvironment(testCase.getUniqueId());
+        fields.setLabels(new String[]{"Automation"});
 
         Metafield project = new Metafield();
         project.setKey(Config.getValue(PROJECT_KEY));
