@@ -204,7 +204,7 @@ public class Runner {
         Map<Integer, TestStep> map = new HashMap<Integer, TestStep>();
         prepareTestSteps(map, testSteps, 0, "");
 
-        for (int i = 1; i < map.size(); i++) {
+        for (int i = 1; i <= map.size(); i++) {
             TestStep step = map.get(i);
             if (step != null) {
                 ZapiTestStep zapiStep = new ZapiTestStep();
@@ -220,11 +220,13 @@ public class Runner {
     }
 
     private static void prepareTestSteps(Map<Integer, TestStep> map, List<TestStep> testSteps, int level, String prefix) {
-        for (TestStep testStep : testSteps) {
-            testStep.setDescription(String.format("%s: %s", prefix, testStep.getDescription()));
+        for (int i = 1; i <= testSteps.size(); i++) {
+            TestStep testStep = testSteps.get(i);
+            testStep.setDescription(String.format("%s: %s", prefix + i, testStep.getDescription()));
             map.put(map.size() + 1, testStep);
+
             if (testStep.getSteps() != null && testStep.getSteps().size() > 0) {
-                prepareTestSteps(map, testStep.getSteps(), level + 1, prefix + level + ".");
+                prepareTestSteps(map, testStep.getSteps(), level + 1, prefix + i + ".");
             }
         }
     }

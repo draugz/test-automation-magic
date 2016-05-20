@@ -1,10 +1,12 @@
 package lv.ctco.zephyr.transformer;
 
 import lv.ctco.zephyr.beans.TestCase;
+import lv.ctco.zephyr.beans.TestStep;
 import lv.ctco.zephyr.enums.TestLevel;
 import lv.ctco.zephyr.enums.TestStatus;
 import ru.yandex.qatools.allure.model.Label;
 import ru.yandex.qatools.allure.model.SeverityLevel;
+import ru.yandex.qatools.allure.model.Step;
 import ru.yandex.qatools.allure.model.TestCaseResult;
 import ru.yandex.qatools.allure.model.TestSuiteResult;
 
@@ -24,6 +26,7 @@ public class AllureTransformer {
                 currentTestCase.setKey(getJiraKey(currentTestCaseResult));
                 currentTestCase.setStatus(getStatus(currentTestCaseResult));
                 currentTestCase.setSeverity(getSeverity(currentTestCaseResult));
+                currentTestCase.setSteps(addTestSteps(currentTestCaseResult.getSteps(), 1));
                 testCases.add(currentTestCase);
             }
         }
@@ -91,5 +94,17 @@ public class AllureTransformer {
             }
         }
         return null;
+    }
+
+    private static List<TestStep> addTestSteps(List<Step> steps, int level) {
+        List<TestStep> result = new ArrayList<TestStep>(steps.size());
+        for (Step step : steps) {
+            TestStep testStep = new TestStep();
+            testStep.setLevel(level);
+            testStep.setDescription(step.getName());
+            testStep.setSteps(addTestSteps(step.getSteps(), level + 1));
+            result.add(testStep);
+        }
+        return result;
     }
 }
