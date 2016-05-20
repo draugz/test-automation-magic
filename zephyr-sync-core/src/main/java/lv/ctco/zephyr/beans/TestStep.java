@@ -7,6 +7,13 @@ public class TestStep {
     private String description;
     private List<TestStep> steps = null;
 
+    public TestStep() {
+    }
+
+    public TestStep(String description) {
+        this.description = description;
+    }
+
     public String getDescription() {
         return description;
     }

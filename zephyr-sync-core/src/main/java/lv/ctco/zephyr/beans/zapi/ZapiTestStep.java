@@ -8,6 +8,13 @@ public class ZapiTestStep {
     private String data;
     private String result;
 
+    public ZapiTestStep() {
+    }
+
+    public ZapiTestStep(String step) {
+        this.step = step;
+    }
+
     public Integer getId() {
         return id;
     }

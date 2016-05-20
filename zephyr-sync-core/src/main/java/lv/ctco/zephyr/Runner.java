@@ -206,14 +206,9 @@ public class Runner {
         Map<Integer, TestStep> map = new HashMap<Integer, TestStep>();
         prepareTestSteps(map, testSteps, 0, "", Boolean.valueOf(getValue(ORDERED_STEPS)));
 
-        for (int i = 1; i <= map.size(); i++) {
-            TestStep step = map.get(i - 1);
+        for (TestStep step : testSteps) {
             if (step != null) {
-                ZapiTestStep zapiStep = new ZapiTestStep();
-                zapiStep.setOrderId(i);
-                zapiStep.setStep(step.getDescription());
-
-                HttpResponse response = HttpUtils.post("zapi/latest/teststep/" + testCase.getId(), zapiStep);
+                HttpResponse response = HttpUtils.post("zapi/latest/teststep/" + testCase.getId(), new ZapiTestStep(step.getDescription()));
                 if (response.getStatusLine().getStatusCode() != 200) {
                     throw new InternalException("Could not add Test Steps for Test Case: " + testCase.getId() + "\n");
                 }

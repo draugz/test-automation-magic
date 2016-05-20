@@ -1,6 +1,7 @@
 package lv.ctco.zephyr.transformer;
 
 import lv.ctco.zephyr.beans.TestCase;
+import lv.ctco.zephyr.beans.TestStep;
 import lv.ctco.zephyr.beans.testresult.cucumber.Feature;
 import lv.ctco.zephyr.beans.testresult.cucumber.Scenario;
 import lv.ctco.zephyr.beans.testresult.cucumber.Step;
@@ -31,6 +32,7 @@ public class CucumberTransformer extends ObjectTransformer {
                 test.setUniqueId(generateUniqueId(feature, scenario));
                 test.setStoryKeys(resolveJiraKeys(scenario, "@Story="));
                 test.setStatus(resolveStatus(scenario));
+                test.setSteps(resolveTestSteps(scenario));
                 testCases.add(test);
             }
         }
@@ -64,5 +66,13 @@ public class CucumberTransformer extends ObjectTransformer {
             }
         }
         return result.size() != 0 ? result : null;
+    }
+
+    private static List<TestStep> resolveTestSteps(Scenario scenario) {
+        List<TestStep> result = new ArrayList<TestStep>();
+        for (Step step : scenario.getSteps()) {
+            result.add(new TestStep(step.getKeyword() + step.getName()));
+        }
+        return result;
     }
 }
