@@ -81,7 +81,7 @@ public class AllureTransformer {
                 storyKeys.add(currentLabel.getValue());
             }
         }
-        return storyKeys;
+        return storyKeys.size() != 0 ? storyKeys : null;
     }
 
     private static String getJiraKey(TestCaseResult currentTestCaseResult) {

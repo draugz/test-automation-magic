@@ -3,6 +3,7 @@ package lv.ctco.zephyr;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 import lv.ctco.zephyr.beans.Metafield;
 import lv.ctco.zephyr.beans.TestCase;
+import lv.ctco.zephyr.beans.TestStep;
 import lv.ctco.zephyr.beans.jira.Fields;
 import lv.ctco.zephyr.beans.jira.Issue;
 import lv.ctco.zephyr.beans.jira.Project;
@@ -12,6 +13,7 @@ import lv.ctco.zephyr.beans.zapi.CycleList;
 import lv.ctco.zephyr.beans.zapi.Execution;
 import lv.ctco.zephyr.beans.zapi.ExecutionRequest;
 import lv.ctco.zephyr.beans.zapi.ExecutionResponse;
+import lv.ctco.zephyr.beans.zapi.ZapiTestStep;
 import lv.ctco.zephyr.enums.ReportType;
 import lv.ctco.zephyr.enums.TestStatus;
 import lv.ctco.zephyr.transformer.AllureTransformer;
@@ -66,6 +68,7 @@ public class Runner {
         for (TestCase testCase : testCases) {
             if (testCase.getId() == null) {
                 createTestIssue(testCase);
+                addStepsToTestIssue(testCase);
             }
         }
 
@@ -128,15 +131,8 @@ public class Runner {
             }
         }
 
-        /*
-        * Dobavil v map esho Jira Key kak kljuch
-        * esli u TC est uzhe kakojto Key iz reporta, to ishem po mapu.
-        * Vrode dolzhno rabotat, zavtra proverju, nadejus nichego ne slomal:)
-        *
-        * */
-
         for (TestCase testCase : resultTestCases) {
-            if (!(testCase.getKey() == null)) {
+            if (testCase.getKey() != null) {
                 if (uniqueKeyMap.containsKey(testCase.getKey())) {
                     testCase.setId(uniqueKeyMap.get(testCase.getKey()).getId());
                 } else {
@@ -199,6 +195,32 @@ public class Runner {
             testCase.setId(Integer.valueOf(result.getId()));
             testCase.setKey(result.getKey());
         }
+    }
+
+    private static void addStepsToTestIssue(TestCase testCase) throws Exception {
+        log("Adding Test steps to Test issue: " + testCase.getKey());
+        List<TestStep> testSteps = testCase.getSteps();
+
+        Map<Integer, TestStep> map = prepareTestSteps(testSteps);
+
+        for (int i = 0; i < map.size(); i++) {
+            TestStep step = map.get(i);
+            if (step != null) {
+                ZapiTestStep zapiStep = new ZapiTestStep();
+                zapiStep.setOrderId(i + 1);
+                zapiStep.setStep(step.getDescription());
+
+                HttpResponse response = HttpUtils.post("zapi/latest/teststep/" + testCase.getId(), zapiStep);
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    throw new InternalException("Could not add Test Steps for Test Case: " + testCase.getId() + "\n");
+                }
+            }
+        }
+    }
+
+    private static Map<Integer, TestStep> prepareTestSteps(List<TestStep> testStep) {
+        return new HashMap<Integer, TestStep>();
+
     }
 
     private static void retrieveProjectMetaInfo() throws Exception {

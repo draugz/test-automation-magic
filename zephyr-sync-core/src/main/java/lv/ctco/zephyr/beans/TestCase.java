@@ -14,6 +14,7 @@ public class TestCase {
     private String uniqueId;
     private String name;
     private List<String> storyKeys;
+    private List<TestStep> steps;
     private TestStatus status = NOT_EXECUTED;
     private TestLevel severity;
     private TestLevel priority = TestLevel.MEDIUM;
@@ -50,20 +51,28 @@ public class TestCase {
         this.name = name;
     }
 
-    public TestStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TestStatus status) {
-        this.status = status;
-    }
-
     public List<String> getStoryKeys() {
         return storyKeys;
     }
 
     public void setStoryKeys(List<String> storyKeys) {
         this.storyKeys = storyKeys;
+    }
+
+    public List<TestStep> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(List<TestStep> steps) {
+        this.steps = steps;
+    }
+
+    public TestStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TestStatus status) {
+        this.status = status;
     }
 
     public TestLevel getSeverity() {
