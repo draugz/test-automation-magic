@@ -100,7 +100,6 @@ public class AllureTransformer {
         List<TestStep> result = new ArrayList<TestStep>(steps.size());
         for (Step step : steps) {
             TestStep testStep = new TestStep();
-            testStep.setLevel(level);
             testStep.setDescription(step.getName());
             testStep.setSteps(addTestSteps(step.getSteps(), level + 1));
             result.add(testStep);

@@ -29,8 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static lv.ctco.zephyr.Config.getValue;
 import static lv.ctco.zephyr.Config.loadConfigProperties;
+import static lv.ctco.zephyr.enums.ConfigProperty.ORDERED_STEPS;
 import static lv.ctco.zephyr.enums.ConfigProperty.PROJECT_KEY;
 import static lv.ctco.zephyr.enums.ConfigProperty.RELEASE_VERSION;
 import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_PATH;
@@ -112,7 +114,7 @@ public class Runner {
                 issues.addAll(searchInJQL(search, SKIP).getIssues());
             }
         }
-        log(String.format("Retrieved %s Test issues\n", issues.size()));
+        log(format("Retrieved %s Test issues\n", issues.size()));
         return issues;
     }
 
@@ -136,7 +138,7 @@ public class Runner {
                 if (uniqueKeyMap.containsKey(testCase.getKey())) {
                     testCase.setId(uniqueKeyMap.get(testCase.getKey()).getId());
                 } else {
-                    log(String.format("Key: %s, is not found, new Test Case should be created", testCase.getKey()));
+                    log(format("Key: %s, is not found, new Test Case should be created", testCase.getKey()));
                     testCase.setId(null);
                     testCase.setKey(null);
                 }
@@ -202,10 +204,10 @@ public class Runner {
         List<TestStep> testSteps = testCase.getSteps();
 
         Map<Integer, TestStep> map = new HashMap<Integer, TestStep>();
-        prepareTestSteps(map, testSteps, 0, "");
+        prepareTestSteps(map, testSteps, 0, "", Boolean.valueOf(getValue(ORDERED_STEPS)));
 
         for (int i = 1; i <= map.size(); i++) {
-            TestStep step = map.get(i);
+            TestStep step = map.get(i - 1);
             if (step != null) {
                 ZapiTestStep zapiStep = new ZapiTestStep();
                 zapiStep.setOrderId(i);
@@ -219,14 +221,15 @@ public class Runner {
         }
     }
 
-    private static void prepareTestSteps(Map<Integer, TestStep> map, List<TestStep> testSteps, int level, String prefix) {
+    private static void prepareTestSteps(Map<Integer, TestStep> map, List<TestStep> testSteps, int level, String prefix, Boolean isOrdered) {
         for (int i = 1; i <= testSteps.size(); i++) {
-            TestStep testStep = testSteps.get(i);
-            testStep.setDescription(String.format("%s: %s", prefix + i, testStep.getDescription()));
+            TestStep testStep = testSteps.get(i - 1);
+            String description = testStep.getDescription();
+            testStep.setDescription(isOrdered ? format("%s %s", prefix + i + ".", description) : description);
             map.put(map.size() + 1, testStep);
 
             if (testStep.getSteps() != null && testStep.getSteps().size() > 0) {
-                prepareTestSteps(map, testStep.getSteps(), level + 1, prefix + i + ".");
+                prepareTestSteps(map, testStep.getSteps(), level + 1, prefix + i + ".", isOrdered);
             }
         }
     }
@@ -255,7 +258,7 @@ public class Runner {
         if (projectId == null || versionId == null)
             throw new RuntimeException("JIRA projectID or versionID are missing");
 
-        String response = getAndReturnBody(String.format("zapi/latest/cycle?projectId=%s&versionId=%s", projectId, versionId));
+        String response = getAndReturnBody(format("zapi/latest/cycle?projectId=%s&versionId=%s", projectId, versionId));
         CycleList cycleList = deserialize(response, CycleList.class);
         if (cycleList == null || cycleList.getCycleMap().size() == 0) return null;
 
@@ -294,7 +297,7 @@ public class Runner {
         for (Execution execution : executions) {
             result.put(execution.getIssueKey(), execution);
         }
-        log(String.format("Retrieved %s Test executions\n", executions.size()));
+        log(format("Retrieved %s Test executions\n", executions.size()));
         return result;
     }
 

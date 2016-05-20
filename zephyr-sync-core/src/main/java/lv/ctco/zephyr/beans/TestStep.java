@@ -4,17 +4,8 @@ import java.util.List;
 
 public class TestStep {
 
-    private int level;
     private String description;
     private List<TestStep> steps = null;
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
 
     public String getDescription() {
         return description;

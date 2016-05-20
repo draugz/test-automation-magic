@@ -8,7 +8,8 @@ public enum ConfigProperty {
     RELEASE_VERSION(4),
     TEST_CYCLE(5),
     JIRA_URL(6),
-    REPORT_PATH(7);
+    REPORT_PATH(7),
+    ORDERED_STEPS(8);
 
     private int id;
 
