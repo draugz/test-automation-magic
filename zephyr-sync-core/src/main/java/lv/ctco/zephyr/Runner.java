@@ -37,8 +37,8 @@ import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_PATH;
 import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_TYPE;
 import static lv.ctco.zephyr.enums.ConfigProperty.TEST_CYCLE;
 import static lv.ctco.zephyr.enums.IssueType.TEST;
-import static lv.ctco.zephyr.util.ObjectTransformer.deserialize;
 import static lv.ctco.zephyr.util.HttpUtils.getAndReturnBody;
+import static lv.ctco.zephyr.util.ObjectTransformer.deserialize;
 import static lv.ctco.zephyr.util.Utils.log;
 import static lv.ctco.zephyr.util.Utils.readAllureReport;
 import static lv.ctco.zephyr.util.Utils.readCucumberReport;
@@ -201,13 +201,14 @@ public class Runner {
         log("Adding Test steps to Test issue: " + testCase.getKey());
         List<TestStep> testSteps = testCase.getSteps();
 
-        Map<Integer, TestStep> map = prepareTestSteps(testSteps);
+        Map<Integer, TestStep> map = new HashMap<Integer, TestStep>();
+        prepareTestSteps(map, testSteps, 0, "");
 
-        for (int i = 0; i < map.size(); i++) {
+        for (int i = 1; i < map.size(); i++) {
             TestStep step = map.get(i);
             if (step != null) {
                 ZapiTestStep zapiStep = new ZapiTestStep();
-                zapiStep.setOrderId(i + 1);
+                zapiStep.setOrderId(i);
                 zapiStep.setStep(step.getDescription());
 
                 HttpResponse response = HttpUtils.post("zapi/latest/teststep/" + testCase.getId(), zapiStep);
@@ -218,9 +219,14 @@ public class Runner {
         }
     }
 
-    private static Map<Integer, TestStep> prepareTestSteps(List<TestStep> testStep) {
-        return new HashMap<Integer, TestStep>();
-
+    private static void prepareTestSteps(Map<Integer, TestStep> map, List<TestStep> testSteps, int level, String prefix) {
+        for (TestStep testStep : testSteps) {
+            testStep.setDescription(String.format("%s: %s", prefix, testStep.getDescription()));
+            map.put(map.size() + 1, testStep);
+            if (testStep.getSteps() != null && testStep.getSteps().size() > 0) {
+                prepareTestSteps(map, testStep.getSteps(), level + 1, prefix + level + ".");
+            }
+        }
     }
 
     private static void retrieveProjectMetaInfo() throws Exception {
