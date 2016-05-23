@@ -1,11 +1,12 @@
 package lv.ctco.zephyr.transformer;
 
 import lv.ctco.zephyr.beans.TestCase;
-import lv.ctco.zephyr.beans.testcase.AllureTestCase;
+import lv.ctco.zephyr.beans.TestStep;
 import lv.ctco.zephyr.enums.TestLevel;
 import lv.ctco.zephyr.enums.TestStatus;
 import ru.yandex.qatools.allure.model.Label;
 import ru.yandex.qatools.allure.model.SeverityLevel;
+import ru.yandex.qatools.allure.model.Step;
 import ru.yandex.qatools.allure.model.TestCaseResult;
 import ru.yandex.qatools.allure.model.TestSuiteResult;
 
@@ -18,28 +19,25 @@ public class AllureTransformer {
         List<TestCase> testCases = new ArrayList<TestCase>();
         for (TestSuiteResult currentTestSuiteResult : result) {
             for (TestCaseResult currentTestCaseResult : currentTestSuiteResult.getTestCases()) {
-                TestCase currentTestCase = new AllureTestCase();
+                TestCase currentTestCase = new TestCase();
                 currentTestCase.setName(currentTestCaseResult.getName());
-                currentTestCase.setUniqueId(currentTestCaseResult.getName());
-                currentTestCase.setStatus(getStatusFromAllureTestCase(currentTestCaseResult));
-                currentTestCase.setSeverity(getSeverityFromAllureTestCase(currentTestCaseResult));
+                currentTestCase.setUniqueId(generateUniqueId(currentTestCaseResult));
+                currentTestCase.setStoryKeys(getStoryKeys(currentTestCaseResult));
+                currentTestCase.setKey(getJiraKey(currentTestCaseResult));
+                currentTestCase.setStatus(getStatus(currentTestCaseResult));
+                currentTestCase.setSeverity(getSeverity(currentTestCaseResult));
+                currentTestCase.setSteps(addTestSteps(currentTestCaseResult.getSteps(), 1));
                 testCases.add(currentTestCase);
             }
         }
         return testCases;
     }
 
-    private static String getUniqueIdFromAllureTestCase(TestCaseResult testCaseResult) {
-        List<Label> labels = testCaseResult.getLabels();
-        for (Label currentLabel : labels) {
-            if (currentLabel.getName().equals("testId") && !currentLabel.getValue().isEmpty()) {
-                return currentLabel.getValue();
-            }
-        }
-        return null;
+    private static String generateUniqueId(TestCaseResult testCaseResult) {
+        return testCaseResult.getName();
     }
 
-    private static TestStatus getStatusFromAllureTestCase(TestCaseResult testCaseResult) {
+    private static TestStatus getStatus(TestCaseResult testCaseResult) {
         switch (testCaseResult.getStatus()) {
             case FAILED:
                 return TestStatus.FAILED;
@@ -52,11 +50,11 @@ public class AllureTransformer {
         }
     }
 
-    private static TestLevel getSeverityFromAllureTestCase(TestCaseResult testCaseResult) {
+    private static TestLevel getSeverity(TestCaseResult currentTestCaseResult) {
         String severity = "";
 
-        for (Label currentLabel : testCaseResult.getLabels()) {
-            if (currentLabel.getName().equals("severity") && !currentLabel.getValue().isEmpty()) {
+        for (Label currentLabel : currentTestCaseResult.getLabels()) {
+            if (currentLabel.getName().equalsIgnoreCase("severity") && !currentLabel.getValue().isEmpty()) {
                 severity = currentLabel.getValue();
             }
         }
@@ -76,5 +74,36 @@ public class AllureTransformer {
 
         }
         return null;
+    }
+
+    private static List<String> getStoryKeys(TestCaseResult currentTestCaseResult) {
+        List<String> storyKeys = new ArrayList<String>();
+
+        for (Label currentLabel : currentTestCaseResult.getLabels()) {
+            if (currentLabel.getName().equalsIgnoreCase("storyId") && !currentLabel.getValue().isEmpty()) {
+                storyKeys.add(currentLabel.getValue());
+            }
+        }
+        return storyKeys.size() != 0 ? storyKeys : null;
+    }
+
+    private static String getJiraKey(TestCaseResult currentTestCaseResult) {
+        for (Label currentLabel : currentTestCaseResult.getLabels()) {
+            if (currentLabel.getName().equalsIgnoreCase("testcaseid") && !currentLabel.getValue().isEmpty()) {
+                return currentLabel.getValue();
+            }
+        }
+        return null;
+    }
+
+    private static List<TestStep> addTestSteps(List<Step> steps, int level) {
+        List<TestStep> result = new ArrayList<TestStep>(steps.size());
+        for (Step step : steps) {
+            TestStep testStep = new TestStep();
+            testStep.setDescription(step.getName());
+            testStep.setSteps(addTestSteps(step.getSteps(), level + 1));
+            result.add(testStep);
+        }
+        return result;
     }
 }

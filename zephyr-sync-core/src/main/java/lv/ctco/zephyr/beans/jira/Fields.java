@@ -12,6 +12,7 @@ public class Fields {
     private Metafield priority;
     private Metafield customfield_10067;
     private List<Metafield> versions;
+    private String[] labels;
 
     public String getSummary() {
         return summary;
@@ -67,5 +68,13 @@ public class Fields {
 
     public void setSeverity(Metafield severity) {
         this.customfield_10067 = severity;
+    }
+
+    public String[] getLabels() {
+        return labels;
+    }
+
+    public void setLabels(String[] labels) {
+        this.labels = labels;
     }
 }

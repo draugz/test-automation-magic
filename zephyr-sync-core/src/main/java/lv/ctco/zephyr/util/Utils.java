@@ -7,6 +7,7 @@ import ru.yandex.qatools.allure.model.TestSuiteResult;
 import javax.xml.bind.JAXBContext;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +25,10 @@ public class Utils {
     public static JUnitResultTestSuite readJUnitReport(String path) throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(JUnitResultTestSuite.class);
         return (JUnitResultTestSuite) jaxbContext.createUnmarshaller().unmarshal(new File(path));
+    }
+
+    public static String readCucumberReport(String path) throws IOException, URISyntaxException {
+        return readInputStream(new FileInputStream(new File(path)));
     }
 
     public static List<TestSuiteResult> readAllureReport(String path) throws IOException, URISyntaxException {

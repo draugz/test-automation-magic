@@ -3,33 +3,91 @@ package lv.ctco.zephyr.beans;
 import lv.ctco.zephyr.enums.TestLevel;
 import lv.ctco.zephyr.enums.TestStatus;
 
-public interface TestCase {
+import java.util.List;
 
-    Integer getId();
+import static lv.ctco.zephyr.enums.TestStatus.NOT_EXECUTED;
 
-    void setId(Integer id);
+public class TestCase {
 
-    TestStatus getStatus();
+    private Integer id;
+    private String key;
+    private String uniqueId;
+    private String name;
+    private List<String> storyKeys;
+    private List<TestStep> steps;
+    private TestStatus status = NOT_EXECUTED;
+    private TestLevel severity;
+    private TestLevel priority = TestLevel.MEDIUM;
 
-    void setStatus(TestStatus status);
+    public Integer getId() {
+        return id;
+    }
 
-    String getUniqueId();
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-    void setUniqueId(String uniqueId);
+    public String getKey() {
+        return key;
+    }
 
-    String getKey();
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-    void setKey(String key);
+    public String getUniqueId() {
+        return uniqueId;
+    }
 
-    TestLevel getSeverity();
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
 
-    void setSeverity(TestLevel severity);
+    public String getName() {
+        return name;
+    }
 
-    String getName();
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    void setName(String name);
+    public List<String> getStoryKeys() {
+        return storyKeys;
+    }
 
-    TestLevel getPriority();
+    public void setStoryKeys(List<String> storyKeys) {
+        this.storyKeys = storyKeys;
+    }
 
-    void setPriority(TestLevel priority);
+    public List<TestStep> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(List<TestStep> steps) {
+        this.steps = steps;
+    }
+
+    public TestStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TestStatus status) {
+        this.status = status;
+    }
+
+    public TestLevel getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(TestLevel severity) {
+        this.severity = severity;
+    }
+
+    public TestLevel getPriority() {
+        return priority;
+    }
+
+    public void setPriority(TestLevel priority) {
+        this.priority = priority;
+    }
 }

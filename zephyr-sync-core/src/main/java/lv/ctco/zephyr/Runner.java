@@ -3,8 +3,10 @@ package lv.ctco.zephyr;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 import lv.ctco.zephyr.beans.Metafield;
 import lv.ctco.zephyr.beans.TestCase;
+import lv.ctco.zephyr.beans.TestStep;
 import lv.ctco.zephyr.beans.jira.Fields;
 import lv.ctco.zephyr.beans.jira.Issue;
+import lv.ctco.zephyr.beans.jira.IssueLink;
 import lv.ctco.zephyr.beans.jira.Project;
 import lv.ctco.zephyr.beans.jira.SearchResponse;
 import lv.ctco.zephyr.beans.zapi.Cycle;
@@ -12,11 +14,12 @@ import lv.ctco.zephyr.beans.zapi.CycleList;
 import lv.ctco.zephyr.beans.zapi.Execution;
 import lv.ctco.zephyr.beans.zapi.ExecutionRequest;
 import lv.ctco.zephyr.beans.zapi.ExecutionResponse;
+import lv.ctco.zephyr.beans.zapi.ZapiTestStep;
 import lv.ctco.zephyr.enums.ReportType;
 import lv.ctco.zephyr.enums.TestStatus;
 import lv.ctco.zephyr.transformer.AllureTransformer;
+import lv.ctco.zephyr.transformer.CucumberTransformer;
 import lv.ctco.zephyr.transformer.JUnitTransformer;
-import lv.ctco.zephyr.util.HttpUtils;
 import lv.ctco.zephyr.util.Utils;
 import org.apache.http.HttpResponse;
 
@@ -26,29 +29,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static lv.ctco.zephyr.Config.getValue;
 import static lv.ctco.zephyr.Config.loadConfigProperties;
+import static lv.ctco.zephyr.enums.ConfigProperty.FORCE_STORY_LINK;
+import static lv.ctco.zephyr.enums.ConfigProperty.ORDERED_STEPS;
 import static lv.ctco.zephyr.enums.ConfigProperty.PROJECT_KEY;
 import static lv.ctco.zephyr.enums.ConfigProperty.RELEASE_VERSION;
 import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_PATH;
 import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_TYPE;
 import static lv.ctco.zephyr.enums.ConfigProperty.TEST_CYCLE;
 import static lv.ctco.zephyr.enums.IssueType.TEST;
-import static lv.ctco.zephyr.util.HttpTransformer.deserialize;
 import static lv.ctco.zephyr.util.HttpUtils.getAndReturnBody;
+import static lv.ctco.zephyr.util.HttpUtils.post;
+import static lv.ctco.zephyr.util.HttpUtils.put;
+import static lv.ctco.zephyr.util.ObjectTransformer.deserialize;
 import static lv.ctco.zephyr.util.Utils.log;
 import static lv.ctco.zephyr.util.Utils.readAllureReport;
+import static lv.ctco.zephyr.util.Utils.readCucumberReport;
 import static lv.ctco.zephyr.util.Utils.readInputStream;
 import static lv.ctco.zephyr.util.Utils.readJUnitReport;
 
 public class Runner {
 
-    public static int TOP = 20;
-    public static int SKIP = 0;
+    private static int TOP = 20;
+    private static int SKIP = 0;
 
-    public static String projectId;
-    public static String versionId;
-    public static String cycleId;
+    private static String projectId;
+    private static String versionId;
+    private static String cycleId;
 
     public static void main(String[] args) throws Exception {
         loadConfigProperties(args);
@@ -64,6 +73,8 @@ public class Runner {
         for (TestCase testCase : testCases) {
             if (testCase.getId() == null) {
                 createTestIssue(testCase);
+                addStepsToTestIssue(testCase);
+                linkToStory(testCase);
             }
         }
 
@@ -107,7 +118,7 @@ public class Runner {
                 issues.addAll(searchInJQL(search, SKIP).getIssues());
             }
         }
-        log(String.format("Retrieved %s Test issues\n", issues.size()));
+        log(format("Retrieved %s Test issues\n", issues.size()));
         return issues;
     }
 
@@ -119,6 +130,7 @@ public class Runner {
     private static void mapToIssues(List<TestCase> resultTestCases, List<Issue> issues) {
         Map<String, Issue> uniqueKeyMap = new HashMap<String, Issue>(issues.size());
         for (Issue issue : issues) {
+            uniqueKeyMap.put(issue.getKey(), issue);
             String environment = issue.getFields().getEnvironment();
             if (environment != null) {
                 uniqueKeyMap.put(environment, issue);
@@ -126,11 +138,21 @@ public class Runner {
         }
 
         for (TestCase testCase : resultTestCases) {
-            Issue issue = uniqueKeyMap.get(testCase.getUniqueId());
-            if (issue == null) continue;
+            if (testCase.getKey() != null) {
+                if (uniqueKeyMap.containsKey(testCase.getKey())) {
+                    testCase.setId(uniqueKeyMap.get(testCase.getKey()).getId());
+                } else {
+                    log(format("Key: %s, is not found, new Test Case should be created", testCase.getKey()));
+                    testCase.setId(null);
+                    testCase.setKey(null);
+                }
+            } else {
+                Issue issue = uniqueKeyMap.get(testCase.getUniqueId());
+                if (issue == null) continue;
 
-            testCase.setId(issue.getId());
-            testCase.setKey(issue.getKey());
+                testCase.setId(issue.getId());
+                testCase.setKey(issue.getKey());
+            }
         }
     }
 
@@ -140,6 +162,7 @@ public class Runner {
         Fields fields = issue.getFields();
         fields.setSummary(testCase.getName());
         fields.setEnvironment(testCase.getUniqueId());
+        fields.setLabels(new String[]{"Automation"});
 
         Metafield project = new Metafield();
         project.setKey(Config.getValue(PROJECT_KEY));
@@ -167,7 +190,7 @@ public class Runner {
         versions.add(version);
         fields.setVersions(versions);
 
-        HttpResponse response = HttpUtils.post("api/2/issue", issue);
+        HttpResponse response = post("api/2/issue", issue);
         if (response.getStatusLine().getStatusCode() != 201) {
             throw new InternalException("Could not create a Test issue in JIRA");
         }
@@ -177,6 +200,55 @@ public class Runner {
         if (result != null) {
             testCase.setId(Integer.valueOf(result.getId()));
             testCase.setKey(result.getKey());
+        }
+    }
+
+    private static void addStepsToTestIssue(TestCase testCase) throws Exception {
+        log("Adding Test steps to Test issue: " + testCase.getKey());
+        List<TestStep> testSteps = testCase.getSteps();
+
+        Map<Integer, TestStep> map = new HashMap<Integer, TestStep>();
+        prepareTestSteps(map, testSteps, 0, "", Boolean.valueOf(getValue(ORDERED_STEPS)));
+
+        for (TestStep step : testSteps) {
+            if (step != null) {
+                HttpResponse response = post("zapi/latest/teststep/" + testCase.getId(), new ZapiTestStep(step.getDescription()));
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    throw new InternalException("Could not add Test Steps for Test Case: " + testCase.getId() + "\n");
+                }
+            }
+        }
+    }
+
+    private static void linkToStory(TestCase testCase) throws Exception {
+        List<String> storyKeys = testCase.getStoryKeys();
+        if (Boolean.valueOf(getValue(FORCE_STORY_LINK))) {
+            if (storyKeys == null || storyKeys.size() == 0) {
+                throw new InternalException("Linking Test issues to Story is mandatory, please check if Story marker exists in " + testCase.getKey());
+            }
+        }
+        if (storyKeys == null) return;
+
+        log("Linking Test issue " + testCase.getKey() + " to Stories " + testCase.getStoryKeys());
+        for (String storyKey : storyKeys) {
+            HttpResponse response = post("api/2/issueLink", new IssueLink(testCase.getKey(), storyKey));
+            if (response.getStatusLine().getStatusCode() != 201) {
+                throw new InternalException("Could not link Test issue: " + testCase.getId() + " to Story " + storyKey + ". " +
+                        "Please check if Story issue exists and is valid\n");
+            }
+        }
+    }
+
+    private static void prepareTestSteps(Map<Integer, TestStep> map, List<TestStep> testSteps, int level, String prefix, Boolean isOrdered) {
+        for (int i = 1; i <= testSteps.size(); i++) {
+            TestStep testStep = testSteps.get(i - 1);
+            String description = testStep.getDescription();
+            testStep.setDescription(isOrdered ? format("%s %s", prefix + i + ".", description) : description);
+            map.put(map.size() + 1, testStep);
+
+            if (testStep.getSteps() != null && testStep.getSteps().size() > 0) {
+                prepareTestSteps(map, testStep.getSteps(), level + 1, prefix + i + ".", isOrdered);
+            }
         }
     }
 
@@ -201,9 +273,10 @@ public class Runner {
     }
 
     private static String getTestCycleId() throws Exception {
-        if (projectId == null || versionId == null) throw new RuntimeException("JIRA projectID or versionID are missing");
+        if (projectId == null || versionId == null)
+            throw new RuntimeException("JIRA projectID or versionID are missing");
 
-        String response = getAndReturnBody(String.format("zapi/latest/cycle?projectId=%s&versionId=%s", projectId, versionId));
+        String response = getAndReturnBody(format("zapi/latest/cycle?projectId=%s&versionId=%s", projectId, versionId));
         CycleList cycleList = deserialize(response, CycleList.class);
         if (cycleList == null || cycleList.getCycleMap().size() == 0) return null;
 
@@ -242,7 +315,7 @@ public class Runner {
         for (Execution execution : executions) {
             result.put(execution.getIssueKey(), execution);
         }
-        log(String.format("Retrieved %s Test executions\n", executions.size()));
+        log(format("Retrieved %s Test executions\n", executions.size()));
         return result;
     }
 
@@ -261,7 +334,7 @@ public class Runner {
         execution.setMethod(1);
         execution.setIssues(keys);
 
-        HttpResponse response = HttpUtils.post("zapi/latest/execution/addTestsToCycle", execution);
+        HttpResponse response = post("zapi/latest/execution/addTestsToCycle", execution);
         if (response.getStatusLine().getStatusCode() != 200) {
             throw new InternalException("Could not link Test cases\n");
         }
@@ -293,7 +366,7 @@ public class Runner {
         ExecutionRequest request = new ExecutionRequest();
         request.setStatus(status.getId());
 
-        HttpResponse response = HttpUtils.put("zapi/latest/execution/" + id + "/execute", request);
+        HttpResponse response = put("zapi/latest/execution/" + id + "/execute", request);
         if (response.getStatusLine().getStatusCode() != 200) {
             throw new InternalException("Could not successfully update execution status");
         }
@@ -306,6 +379,8 @@ public class Runner {
         switch (type) {
             case JUNIT:
                 return JUnitTransformer.transform(readJUnitReport(path));
+            case CUCUMBER:
+                return CucumberTransformer.transform(readCucumberReport(path));
             case ALLURE:
                 return AllureTransformer.transform(readAllureReport(path));
             default:

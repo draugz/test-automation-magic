@@ -1,7 +1,6 @@
 package lv.ctco.zephyr.transformer;
 
 import lv.ctco.zephyr.beans.TestCase;
-import lv.ctco.zephyr.beans.testcase.JUnitTestCase;
 import lv.ctco.zephyr.beans.testresult.junit.JUnitResult;
 import lv.ctco.zephyr.beans.testresult.junit.JUnitResultTestSuite;
 import lv.ctco.zephyr.enums.TestStatus;
@@ -20,16 +19,16 @@ public class JUnitTransformer {
 
         List<TestCase> result = new ArrayList<TestCase>();
         for (JUnitResult testCase : resultTestSuite.getTestcase()) {
-            TestCase test = new JUnitTestCase();
+            TestCase test = new TestCase();
             test.setName(testCase.getName());
-            test.setUniqueId(getUniqueIdFromJUnitTestCase(testCase));
+            test.setUniqueId(generateUniqueId(testCase));
             test.setStatus(testCase.getError() != null || testCase.getFailure() != null ? TestStatus.FAILED : TestStatus.PASSED);
             result.add(test);
         }
         return result;
     }
 
-    public static String getUniqueIdFromJUnitTestCase(JUnitResult testCase) {
+    public static String generateUniqueId(JUnitResult testCase) {
         return String.join("-", normalizeKey(testCase.getClassname()), normalizeKey(testCase.getName()));
     }
 }
