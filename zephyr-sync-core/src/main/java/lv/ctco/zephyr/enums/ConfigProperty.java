@@ -9,7 +9,8 @@ public enum ConfigProperty {
     TEST_CYCLE(5),
     JIRA_URL(6),
     REPORT_PATH(7),
-    ORDERED_STEPS(8);
+    ORDERED_STEPS(8),
+    FORCE_STORY_LINK(9);
 
     private int id;
 

@@ -32,6 +32,7 @@ import java.util.Map;
 import static java.lang.String.format;
 import static lv.ctco.zephyr.Config.getValue;
 import static lv.ctco.zephyr.Config.loadConfigProperties;
+import static lv.ctco.zephyr.enums.ConfigProperty.FORCE_STORY_LINK;
 import static lv.ctco.zephyr.enums.ConfigProperty.ORDERED_STEPS;
 import static lv.ctco.zephyr.enums.ConfigProperty.PROJECT_KEY;
 import static lv.ctco.zephyr.enums.ConfigProperty.RELEASE_VERSION;
@@ -221,6 +222,11 @@ public class Runner {
 
     private static void linkToStory(TestCase testCase) throws Exception {
         List<String> storyKeys = testCase.getStoryKeys();
+        if (Boolean.valueOf(getValue(FORCE_STORY_LINK))) {
+            if (storyKeys == null || storyKeys.size() == 0) {
+                throw new InternalException("Linking Test issues to Story is mandatory, please check if Story marker exists in " + testCase.getKey());
+            }
+        }
         if (storyKeys == null) return;
 
         log("Linking Test issue " + testCase.getKey() + " to Stories " + testCase.getStoryKeys());
