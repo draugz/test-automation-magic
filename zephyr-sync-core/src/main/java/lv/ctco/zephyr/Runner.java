@@ -6,6 +6,7 @@ import lv.ctco.zephyr.beans.TestCase;
 import lv.ctco.zephyr.beans.TestStep;
 import lv.ctco.zephyr.beans.jira.Fields;
 import lv.ctco.zephyr.beans.jira.Issue;
+import lv.ctco.zephyr.beans.jira.IssueLink;
 import lv.ctco.zephyr.beans.jira.Project;
 import lv.ctco.zephyr.beans.jira.SearchResponse;
 import lv.ctco.zephyr.beans.zapi.Cycle;
@@ -19,7 +20,6 @@ import lv.ctco.zephyr.enums.TestStatus;
 import lv.ctco.zephyr.transformer.AllureTransformer;
 import lv.ctco.zephyr.transformer.CucumberTransformer;
 import lv.ctco.zephyr.transformer.JUnitTransformer;
-import lv.ctco.zephyr.util.HttpUtils;
 import lv.ctco.zephyr.util.Utils;
 import org.apache.http.HttpResponse;
 
@@ -40,6 +40,8 @@ import static lv.ctco.zephyr.enums.ConfigProperty.REPORT_TYPE;
 import static lv.ctco.zephyr.enums.ConfigProperty.TEST_CYCLE;
 import static lv.ctco.zephyr.enums.IssueType.TEST;
 import static lv.ctco.zephyr.util.HttpUtils.getAndReturnBody;
+import static lv.ctco.zephyr.util.HttpUtils.post;
+import static lv.ctco.zephyr.util.HttpUtils.put;
 import static lv.ctco.zephyr.util.ObjectTransformer.deserialize;
 import static lv.ctco.zephyr.util.Utils.log;
 import static lv.ctco.zephyr.util.Utils.readAllureReport;
@@ -71,6 +73,7 @@ public class Runner {
             if (testCase.getId() == null) {
                 createTestIssue(testCase);
                 addStepsToTestIssue(testCase);
+                linkToStory(testCase);
             }
         }
 
@@ -186,7 +189,7 @@ public class Runner {
         versions.add(version);
         fields.setVersions(versions);
 
-        HttpResponse response = HttpUtils.post("api/2/issue", issue);
+        HttpResponse response = post("api/2/issue", issue);
         if (response.getStatusLine().getStatusCode() != 201) {
             throw new InternalException("Could not create a Test issue in JIRA");
         }
@@ -208,10 +211,24 @@ public class Runner {
 
         for (TestStep step : testSteps) {
             if (step != null) {
-                HttpResponse response = HttpUtils.post("zapi/latest/teststep/" + testCase.getId(), new ZapiTestStep(step.getDescription()));
+                HttpResponse response = post("zapi/latest/teststep/" + testCase.getId(), new ZapiTestStep(step.getDescription()));
                 if (response.getStatusLine().getStatusCode() != 200) {
                     throw new InternalException("Could not add Test Steps for Test Case: " + testCase.getId() + "\n");
                 }
+            }
+        }
+    }
+
+    private static void linkToStory(TestCase testCase) throws Exception {
+        List<String> storyKeys = testCase.getStoryKeys();
+        if (storyKeys == null) return;
+
+        log("Linking Test issue " + testCase.getKey() + " to Stories " + testCase.getStoryKeys());
+        for (String storyKey : storyKeys) {
+            HttpResponse response = post("api/2/issueLink", new IssueLink(testCase.getKey(), storyKey));
+            if (response.getStatusLine().getStatusCode() != 201) {
+                throw new InternalException("Could not link Test issue: " + testCase.getId() + " to Story " + storyKey + ". " +
+                        "Please check if Story issue exists and is valid\n");
             }
         }
     }
@@ -311,7 +328,7 @@ public class Runner {
         execution.setMethod(1);
         execution.setIssues(keys);
 
-        HttpResponse response = HttpUtils.post("zapi/latest/execution/addTestsToCycle", execution);
+        HttpResponse response = post("zapi/latest/execution/addTestsToCycle", execution);
         if (response.getStatusLine().getStatusCode() != 200) {
             throw new InternalException("Could not link Test cases\n");
         }
@@ -343,7 +360,7 @@ public class Runner {
         ExecutionRequest request = new ExecutionRequest();
         request.setStatus(status.getId());
 
-        HttpResponse response = HttpUtils.put("zapi/latest/execution/" + id + "/execute", request);
+        HttpResponse response = put("zapi/latest/execution/" + id + "/execute", request);
         if (response.getStatusLine().getStatusCode() != 200) {
             throw new InternalException("Could not successfully update execution status");
         }
