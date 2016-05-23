@@ -231,7 +231,7 @@ public class Runner {
 
         log("Linking Test issue " + testCase.getKey() + " to Stories " + testCase.getStoryKeys());
         for (String storyKey : storyKeys) {
-            HttpResponse response = post("api/2/issueLink", new IssueLink(testCase.getKey(), storyKey));
+            HttpResponse response = post("api/2/issueLink", new IssueLink(testCase.getKey(), storyKey.toUpperCase()));
             if (response.getStatusLine().getStatusCode() != 201) {
                 throw new InternalException("Could not link Test issue: " + testCase.getId() + " to Story " + storyKey + ". " +
                         "Please check if Story issue exists and is valid\n");
