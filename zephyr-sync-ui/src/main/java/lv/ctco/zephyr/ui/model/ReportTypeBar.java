@@ -17,6 +17,7 @@ public class ReportTypeBar {
     private RadioButton rbtAllureReport = new RadioButton("Allure");
     private RadioButton rbtJunitReport = new RadioButton("JUnit");
     private RadioButton rbtCucumberReport = new RadioButton("Cucumber");
+    private ToggleGroup toggleGroup = new ToggleGroup();
 
     public ReportTypeBar() {
         this.box.setPadding(new Insets(0, 0, 0, 0));
@@ -24,6 +25,10 @@ public class ReportTypeBar {
         box.getChildren().add(rbtAllureReport);
         box.getChildren().add(rbtJunitReport);
         box.getChildren().add(rbtCucumberReport);
+        rbtAllureReport.setToggleGroup(toggleGroup);
+        rbtJunitReport.setToggleGroup(toggleGroup);
+        rbtCucumberReport.setToggleGroup(toggleGroup);
+        rbtAllureReport.setSelected(true);
     }
 
     public HBox getBox() {
