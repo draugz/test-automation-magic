@@ -24,7 +24,7 @@ public class ZephyrMagicUIDemo extends Application {
         mainBar.addLoginBar();
         mainBar.addPasswordBar();
         mainBar.addButton();
-        mainBar.addListnerForAllTextFields();
+        mainBar.addListenerForAllTextFields();
         stage.show();
     }
 

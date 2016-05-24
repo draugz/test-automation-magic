@@ -104,7 +104,7 @@ public class MainBar {
         });
     }
 
-    public void addListnerForAllTextFields() {
+    public void addListenerForAllTextFields() {
         Set<Node> nodes = getBox().lookupAll(".text-field");
         for (Node node : nodes) {
             addListenerForField((TextField) node);
