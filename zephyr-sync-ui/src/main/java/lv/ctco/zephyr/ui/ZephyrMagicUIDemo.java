@@ -11,15 +11,14 @@ import lv.ctco.zephyr.ui.model.*;
 public class ZephyrMagicUIDemo extends Application {
 
     private static final String TITLE = "Test Automation Magic";
+
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void start(Stage stage) {
-
         MainBar mainBar = new MainBar(stage, TITLE);
-
         mainBar.addReportTypeBar();
         mainBar.addJiraURLBar();
         mainBar.addReportPathBar();
