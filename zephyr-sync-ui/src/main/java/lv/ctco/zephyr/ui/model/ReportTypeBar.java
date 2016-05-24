@@ -6,6 +6,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import lv.ctco.zephyr.enums.ReportType;
 
 /**
  * Created by S7T4M5 on 2016.05.23..
@@ -20,14 +21,11 @@ public class ReportTypeBar {
     private ToggleGroup toggleGroup = new ToggleGroup();
 
     public ReportTypeBar() {
-        this.box.setPadding(new Insets(0, 0, 0, 0));
+        attachRadioButtonsToGroup();
         box.getChildren().add(lblSelectReportType);
         box.getChildren().add(rbtAllureReport);
         box.getChildren().add(rbtJunitReport);
         box.getChildren().add(rbtCucumberReport);
-        rbtAllureReport.setToggleGroup(toggleGroup);
-        rbtJunitReport.setToggleGroup(toggleGroup);
-        rbtCucumberReport.setToggleGroup(toggleGroup);
         rbtAllureReport.setSelected(true);
     }
 
@@ -35,40 +33,20 @@ public class ReportTypeBar {
         return box;
     }
 
-    public void setBox(HBox box) {
-        this.box = box;
+    private void attachRadioButtonsToGroup(){
+        rbtAllureReport.setToggleGroup(toggleGroup);
+        rbtJunitReport.setToggleGroup(toggleGroup);
+        rbtCucumberReport.setToggleGroup(toggleGroup);
     }
 
-    public Label getLblSelectReportType() {
-        return lblSelectReportType;
-    }
-
-    public void setLblSelectReportType(Label lblSelectReportType) {
-        this.lblSelectReportType = lblSelectReportType;
-    }
-
-    public RadioButton getRbtAllureReport() {
-        return rbtAllureReport;
-    }
-
-    public void setRbtAllureReport(RadioButton rbtAllureReport) {
-        this.rbtAllureReport = rbtAllureReport;
-    }
-
-    public RadioButton getRbtJunitReport() {
-        return rbtJunitReport;
-    }
-
-    public void setRbtJunitReport(RadioButton rbtJunitReport) {
-        this.rbtJunitReport = rbtJunitReport;
-    }
-
-    public RadioButton getRbtCucumberReport() {
-        return rbtCucumberReport;
-    }
-
-    public void setRbtCucumberReport(RadioButton rbtCucumberReport) {
-        this.rbtCucumberReport = rbtCucumberReport;
+    public String getReportType(){
+        if (rbtAllureReport.isSelected()){
+            return ReportType.ALLURE.getName();
+        } else if (rbtJunitReport.isSelected()){
+            return ReportType.JUNIT.getName();
+        } else {
+            return ReportType.CUCUMBER.getName();
+        }
     }
 
 }

@@ -1,6 +1,5 @@
 package lv.ctco.zephyr.ui.model;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -20,7 +19,6 @@ public class CheckBoxBar {
     private CheckBox cbxForcedStoryLink = new CheckBox();
 
     public CheckBoxBar() {
-        this.box.setPadding(new Insets(0, 0, 0, 0));
         box.getChildren().add(orderStepsBox);
         box.getChildren().add(forcedStoryBox);
         orderStepsBox.getChildren().add(lblOrderedSteps);
@@ -31,5 +29,19 @@ public class CheckBoxBar {
 
     public VBox getBox() {
         return box;
+    }
+
+    public String getOrderedStepsValue() {
+        if (cbxOrderedSteps.isSelected()) {
+            return "true";
+        }
+        return "false";
+    }
+
+    public String getForcedStoryLinkValue() {
+        if (cbxForcedStoryLink.isSelected()) {
+            return "true";
+        }
+        return "false";
     }
 }

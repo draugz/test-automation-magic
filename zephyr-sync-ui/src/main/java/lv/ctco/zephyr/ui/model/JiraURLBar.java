@@ -9,7 +9,7 @@ import lv.ctco.zephyr.ui.enums.CssStyle;
 /**
  * Created by S7T4M5 on 2016.05.23..
  */
-public class JiraURLBar extends BaseModel{
+public class JiraURLBar{
 
     private HBox box = new HBox(10);
     public Label lblProvideJiraUrl = new Label("Please provide JIRA URL:");
@@ -26,7 +26,9 @@ public class JiraURLBar extends BaseModel{
         return box;
     }
 
-    public TextField getTxtJiraUrl() {
-        return txtJiraUrl;
+    public String getTxtJiraUrlValue() {
+        return txtJiraUrl.getText();
     }
+
+
 }

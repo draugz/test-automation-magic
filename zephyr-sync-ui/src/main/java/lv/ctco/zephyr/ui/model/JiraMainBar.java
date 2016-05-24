@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by S7T4M5 on 2016.05.23..
  */
-public class JiraMainBar extends BaseModel{
+public class JiraMainBar{
 
     private HBox box = new HBox(10);
     private VBox keyBox=new VBox(10);
@@ -25,7 +25,6 @@ public class JiraMainBar extends BaseModel{
     private TextField txtTestCycle = new TextField();
 
     public JiraMainBar() {
-        this.box.setPadding(new Insets(0, 0, 0, 0));
         box.getChildren().add(keyBox);
         box.getChildren().add(versionBox);
         box.getChildren().add(cycleBox);
@@ -52,5 +51,17 @@ public class JiraMainBar extends BaseModel{
 
     public TextField getTxtTestCycle() {
         return txtTestCycle;
+    }
+
+    public String getProjectKeyValue() {
+        return txtProjectKey.getText();
+    }
+
+    public String getProjectVersionValue() {
+        return txtProjectKey.getText();
+    }
+
+    public String getTestCycleValue() {
+        return txtProjectKey.getText();
     }
 }

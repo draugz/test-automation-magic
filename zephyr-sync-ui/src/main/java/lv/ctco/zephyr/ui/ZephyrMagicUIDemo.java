@@ -1,11 +1,8 @@
 package lv.ctco.zephyr.ui;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.stage.Stage;
+import lv.ctco.zephyr.Runner;
 import lv.ctco.zephyr.ui.model.*;
 
 public class ZephyrMagicUIDemo extends Application {
@@ -27,6 +24,11 @@ public class ZephyrMagicUIDemo extends Application {
         mainBar.addLoginBar();
         mainBar.addPasswordBar();
         mainBar.addButton();
+        mainBar.addListnerForAllTextFields();
         stage.show();
+    }
+
+    public static void updateJira(String[] parameters) throws Exception{
+        Runner.main(parameters);
     }
 }
