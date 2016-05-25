@@ -90,7 +90,7 @@ public class AllureTransformer {
     private static String getJiraKey(TestCaseResult currentTestCaseResult) {
         for (Label currentLabel : currentTestCaseResult.getLabels()) {
             if (currentLabel.getName().equalsIgnoreCase("testcaseid") && !currentLabel.getValue().isEmpty()) {
-                return currentLabel.getValue();
+                return currentLabel.getValue().toUpperCase();
             }
         }
         return null;
