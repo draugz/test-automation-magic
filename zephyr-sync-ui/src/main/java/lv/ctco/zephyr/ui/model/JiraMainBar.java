@@ -58,10 +58,10 @@ public class JiraMainBar{
     }
 
     public String getProjectVersionValue() {
-        return txtProjectKey.getText();
+        return txtProjectVersion.getText();
     }
 
     public String getTestCycleValue() {
-        return txtProjectKey.getText();
+        return txtTestCycle.getText();
     }
 }

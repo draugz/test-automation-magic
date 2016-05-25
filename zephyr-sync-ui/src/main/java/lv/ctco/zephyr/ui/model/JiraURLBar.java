@@ -13,7 +13,7 @@ public class JiraURLBar{
 
     private HBox box = new HBox(10);
     public Label lblProvideJiraUrl = new Label("Please provide JIRA URL:");
-    public TextField txtJiraUrl = new TextField("http://swissre.com/rest");
+    public TextField txtJiraUrl = new TextField("http://jira.swissre.com/rest/");
 
     public JiraURLBar() {
         this.box.setPadding(new Insets(10, 0, 0, 0));

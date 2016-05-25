@@ -97,7 +97,7 @@ public class MainBar {
                     try {
                         ZephyrMagicUIDemo.updateJira(getParameters());
                     } catch (Exception ex) {
-                        new Alert(Alert.AlertType.ERROR, ex.toString(), ButtonType.YES);
+                        new Alert(Alert.AlertType.ERROR, ex.toString(), ButtonType.YES).showAndWait();
                     }
                 }
             }
