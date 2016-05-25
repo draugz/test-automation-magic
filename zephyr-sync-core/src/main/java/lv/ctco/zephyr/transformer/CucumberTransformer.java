@@ -26,7 +26,7 @@ public class CucumberTransformer extends ObjectTransformer {
                 TestCase test = new TestCase();
                 List<String> jiraKeys = resolveJiraKeys(scenario, "@TestCaseId=");
                 if (jiraKeys != null && jiraKeys.size() == 1) {
-                    test.setKey(jiraKeys.get(0));
+                    test.setKey(jiraKeys.get(0).toUpperCase());
                 }
                 test.setName(scenario.getName());
                 test.setUniqueId(generateUniqueId(feature, scenario));
