@@ -172,6 +172,10 @@ public class Runner {
         issueType.setName(TEST.getName());
         fields.setIssuetype(issueType);
 
+        Metafield assignee = new Metafield();
+        assignee.setName("");
+        fields.setAssignee(assignee);
+
         if (testCase.getPriority() != null) {
             Metafield priority = new Metafield();
             priority.setName(testCase.getPriority().getName());
