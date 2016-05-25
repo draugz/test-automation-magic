@@ -172,6 +172,10 @@ public class Runner {
         issueType.setName(TEST.getName());
         fields.setIssuetype(issueType);
 
+        Metafield assignee = new Metafield();
+        assignee.setName("");
+        fields.setAssignee(assignee);
+
         if (testCase.getPriority() != null) {
             Metafield priority = new Metafield();
             priority.setName(testCase.getPriority().getName());
@@ -210,12 +214,10 @@ public class Runner {
         Map<Integer, TestStep> map = new HashMap<Integer, TestStep>();
         prepareTestSteps(map, testSteps, 0, "", Boolean.valueOf(getValue(ORDERED_STEPS)));
 
-        for (TestStep step : testSteps) {
-            if (step != null) {
-                HttpResponse response = post("zapi/latest/teststep/" + testCase.getId(), new ZapiTestStep(step.getDescription()));
-                if (response.getStatusLine().getStatusCode() != 200) {
-                    throw new InternalException("Could not add Test Steps for Test Case: " + testCase.getId() + "\n");
-                }
+        for (TestStep step : map.values()) {
+            HttpResponse response = post("zapi/latest/teststep/" + testCase.getId(), new ZapiTestStep(step.getDescription()));
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new InternalException("Could not add Test Steps for Test Case: " + testCase.getId() + "\n");
             }
         }
     }

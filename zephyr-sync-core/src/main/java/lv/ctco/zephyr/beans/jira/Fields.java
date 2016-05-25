@@ -8,6 +8,7 @@ public class Fields {
     private String summary;
     private String environment;
     private Metafield project;
+    private Metafield assignee;
     private Metafield issuetype;
     private Metafield priority;
     private Metafield customfield_10067;
@@ -36,6 +37,14 @@ public class Fields {
 
     public void setProject(Metafield project) {
         this.project = project;
+    }
+
+    public Metafield getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(Metafield assignee) {
+        this.assignee = assignee;
     }
 
     public Metafield getIssuetype() {
