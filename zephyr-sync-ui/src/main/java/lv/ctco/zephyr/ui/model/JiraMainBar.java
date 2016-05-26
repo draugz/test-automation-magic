@@ -25,32 +25,18 @@ public class JiraMainBar{
     private TextField txtTestCycle = new TextField();
 
     public JiraMainBar() {
-        box.getChildren().add(keyBox);
-        box.getChildren().add(versionBox);
-        box.getChildren().add(cycleBox);
+        box.getChildren().addAll(keyBox, versionBox, cycleBox);
+        txtProjectKey.setPrefWidth(178);
+        txtProjectVersion.setPrefWidth(178);
+        txtTestCycle.setPrefWidth(178);
 
-        keyBox.getChildren().add(lblProjectKey);
-        keyBox.getChildren().add(txtProjectKey);
-        versionBox.getChildren().add(lblProjectVersion);
-        versionBox.getChildren().add(txtProjectVersion);
-        cycleBox.getChildren().add(lblTestCycle);
-        cycleBox.getChildren().add(txtTestCycle);
+        keyBox.getChildren().addAll(lblProjectKey, txtProjectKey);
+        versionBox.getChildren().addAll(lblProjectVersion, txtProjectVersion);
+        cycleBox.getChildren().addAll(lblTestCycle, txtTestCycle);
     }
 
     public HBox getBox() {
         return box;
-    }
-
-    public TextField getTxtProjectKey() {
-        return txtProjectKey;
-    }
-
-    public TextField getTxtProjectVersion() {
-        return txtProjectVersion;
-    }
-
-    public TextField getTxtTestCycle() {
-        return txtTestCycle;
     }
 
     public String getProjectKeyValue() {

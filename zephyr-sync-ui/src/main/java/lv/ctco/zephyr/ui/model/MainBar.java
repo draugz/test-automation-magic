@@ -5,6 +5,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -29,12 +30,10 @@ public class MainBar {
     private static final String CSS_CLASS = "controlStyle.css";
 
     private final ReportTypeBar reportTypeBar = new ReportTypeBar();
-    private final JiraURLBar jiraURLBar = new JiraURLBar();
-    private final ReportPathBar reportPathBar = new ReportPathBar();
+    private final PathBar pathBar = new PathBar();
     private final JiraMainBar jiraMainBar = new JiraMainBar();
     private final CheckBoxBar checkBoxBar = new CheckBoxBar();
     private final LoginBar loginBar = new LoginBar();
-    private final PasswordBar passwordBar = new PasswordBar();
 
     private final Button btnUpdateJira = new Button("Update Jira");
     private final Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill mandatory fields", ButtonType.YES);
@@ -42,7 +41,7 @@ public class MainBar {
     public MainBar(Stage stage, String title) {
         stage.setTitle(title);
         GridPane root = new GridPane();
-        Scene scene = new Scene(root, 600, 350, Color.LIGHTGRAY);
+        Scene scene = new Scene(root, 600, 300, Color.LIGHTGRAY);
         stage.setScene(scene);
         scene.getStylesheets().add(CSS_CLASS);
 
@@ -59,12 +58,8 @@ public class MainBar {
         getBox().getChildren().add(reportTypeBar.getBox());
     }
 
-    public void addJiraURLBar() {
-        getBox().getChildren().add(jiraURLBar.getBox());
-    }
-
-    public void addReportPathBar() {
-        getBox().getChildren().add(reportPathBar.getBox());
+    public void addPathBar() {
+        getBox().getChildren().add(pathBar.getBox());
     }
 
     public void addJiraMainBar() {
@@ -79,11 +74,8 @@ public class MainBar {
         getBox().getChildren().add(loginBar.getBox());
     }
 
-    public void addPasswordBar() {
-        getBox().getChildren().add(passwordBar.getBox());
-    }
-
     public void addButton() {
+        btnUpdateJira.setAlignment(Pos.BOTTOM_RIGHT);
         getBox().getChildren().add(btnUpdateJira);
         setButtonRule();
     }
@@ -139,13 +131,13 @@ public class MainBar {
 
     public String[] getParameters(){
         String parameters[]= {loginBar.getTxtLoginValue(),
-                passwordBar.getPswPasswordValue(),
+                loginBar.getPswPasswordValue(),
                 reportTypeBar.getReportType(),
                 jiraMainBar.getProjectKeyValue(),
                 jiraMainBar.getProjectVersionValue(),
                 jiraMainBar.getTestCycleValue(),
-                jiraURLBar.getTxtJiraUrlValue(),
-                reportPathBar.getTxtReportPathValue(),
+                pathBar.getTxtJiraUrlValue(),
+                pathBar.getTxtReportPathValue(),
                 checkBoxBar.getOrderedStepsValue(),
                 checkBoxBar.getForcedStoryLinkValue()};
         return parameters;

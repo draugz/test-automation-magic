@@ -1,9 +1,8 @@
 package lv.ctco.zephyr.ui.model;
 
-import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import lv.ctco.zephyr.enums.ReportType;
@@ -13,7 +12,9 @@ import lv.ctco.zephyr.enums.ReportType;
  */
 public class ReportTypeBar {
 
-    private HBox box = new HBox(10);
+    private HBox box = new HBox(20);
+    private HBox label=new HBox(10);
+    private HBox checkboxes =new HBox(10);
     private Label lblSelectReportType = new Label("Please select report type:");
     private RadioButton rbtAllureReport = new RadioButton("Allure");
     private RadioButton rbtJunitReport = new RadioButton("JUnit");
@@ -22,11 +23,11 @@ public class ReportTypeBar {
 
     public ReportTypeBar() {
         attachRadioButtonsToGroup();
-        box.getChildren().add(lblSelectReportType);
-        box.getChildren().add(rbtAllureReport);
-        box.getChildren().add(rbtJunitReport);
-        box.getChildren().add(rbtCucumberReport);
+        box.getChildren().addAll(label, checkboxes);
+        label.getChildren().add(lblSelectReportType);
+        checkboxes.getChildren().addAll(rbtAllureReport, rbtJunitReport, rbtCucumberReport);
         rbtAllureReport.setSelected(true);
+        label.setAlignment(Pos.CENTER_LEFT);
     }
 
     public HBox getBox() {

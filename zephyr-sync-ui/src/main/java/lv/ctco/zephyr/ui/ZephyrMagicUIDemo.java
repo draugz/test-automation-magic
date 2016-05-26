@@ -17,12 +17,10 @@ public class ZephyrMagicUIDemo extends Application {
     public void start(Stage stage) {
         MainBar mainBar = new MainBar(stage, TITLE);
         mainBar.addReportTypeBar();
-        mainBar.addJiraURLBar();
-        mainBar.addReportPathBar();
+        mainBar.addPathBar();
         mainBar.addJiraMainBar();
         mainBar.addCheckBoxBar();
         mainBar.addLoginBar();
-        mainBar.addPasswordBar();
         mainBar.addButton();
         mainBar.addListenerForAllTextFields();
         stage.show();
