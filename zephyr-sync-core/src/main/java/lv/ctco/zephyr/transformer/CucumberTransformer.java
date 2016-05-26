@@ -30,7 +30,7 @@ public class CucumberTransformer extends ObjectTransformer {
                 }
                 test.setName(scenario.getName());
                 test.setUniqueId(generateUniqueId(feature, scenario));
-                test.setStoryKeys(resolveJiraKeys(scenario, "@Story="));
+                test.setStoryKeys(resolveJiraKeys(scenario, "@Stories="));
                 test.setStatus(resolveStatus(scenario));
                 test.setSteps(resolveTestSteps(scenario));
                 testCases.add(test);
