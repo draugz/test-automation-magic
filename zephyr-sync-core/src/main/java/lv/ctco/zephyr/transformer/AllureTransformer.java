@@ -80,7 +80,7 @@ public class AllureTransformer {
         List<String> storyKeys = new ArrayList<String>();
 
         for (Label currentLabel : currentTestCaseResult.getLabels()) {
-            if (currentLabel.getName().equalsIgnoreCase("storyId") && !currentLabel.getValue().isEmpty()) {
+            if (currentLabel.getName().equalsIgnoreCase("story") && !currentLabel.getValue().isEmpty()) {
                 storyKeys.add(currentLabel.getValue());
             }
         }
@@ -89,7 +89,7 @@ public class AllureTransformer {
 
     private static String getJiraKey(TestCaseResult currentTestCaseResult) {
         for (Label currentLabel : currentTestCaseResult.getLabels()) {
-            if (currentLabel.getName().equalsIgnoreCase("testcaseid") && !currentLabel.getValue().isEmpty()) {
+            if (currentLabel.getName().equalsIgnoreCase("testid") && !currentLabel.getValue().isEmpty()) {
                 return currentLabel.getValue().toUpperCase();
             }
         }
