@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.web.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<Pane prefHeight="367.0" prefWidth="616.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lv.ctco.zephyr.Controller">
+    <children>
+        <VBox fx:id="vboxmain" layoutX="9.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mouseTransparent="false" nodeOrientation="LEFT_TO_RIGHT" prefHeight="354.0" prefWidth="597.0" spacing="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+            <children>
+                <HBox fx:id="rbnBox" prefHeight="37.0" prefWidth="597.0" spacing="10.0">
+                    <children>
+                        <Label alignment="TOP_LEFT" prefHeight="22.0" prefWidth="170.0" text="Please select report type:" />
+                        <RadioButton lineSpacing="10.0" mnemonicParsing="false" onAction="#addToToggleGroup" selected="true" text="Allure" />
+                        <RadioButton lineSpacing="10.0" mnemonicParsing="false" onAction="#addToToggleGroup" text="JUnit" />
+                        <RadioButton lineSpacing="10.0" mnemonicParsing="false" onAction="#addToToggleGroup" text="Cucumber" />
+                    </children>
+                </HBox>
+                <HBox alignment="BOTTOM_LEFT" prefHeight="18.0" prefWidth="608.0" spacing="10.0">
+                    <children>
+                        <VBox alignment="BOTTOM_LEFT" prefHeight="152.0" prefWidth="169.0" spacing="10.0">
+                            <children>
+                                <Label prefHeight="29.0" prefWidth="151.0" text="Please select JIRA URL:" />
+                                <Label prefHeight="27.0" prefWidth="171.0" text="Please select report path URL:" />
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="420.0" spacing="10.0">
+                            <children>
+                                <TextField fx:id="txtJiraURL" text="http://jira.swissre.com" />
+                                <TextField fx:id="reportPath" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER" prefWidth="200.0" spacing="10.0">
+                    <children>
+                        <VBox alignment="CENTER" prefHeight="70.0" prefWidth="195.0" spacing="10.0">
+                            <children>
+                                <Label text="Project key:" />
+                                <TextField fx:id="projectKey"/>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" prefHeight="70.0" prefWidth="195.0" spacing="10.0">
+                            <children>
+                                <Label text="Project version:" />
+                                <TextField fx:id="projectVersion"/>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" prefHeight="70.0" prefWidth="195.0" spacing="10.0">
+                            <children>
+                                <Label text="Project cycle:" />
+                                <TextField fx:id="projectCycle"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+                <HBox prefHeight="78.0" prefWidth="597.0" spacing="10.0">
+                    <children>
+                        <VBox prefHeight="78.0" prefWidth="109.0" spacing="10.0">
+                     <children>
+                        <Label alignment="TOP_CENTER" text="Ordered steps">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Label>
+                        <Label text="Forced story link" />
+                        <Label prefHeight="28.0" prefWidth="33.0" text="Login:" />
+                        <Label text="Password:" />
+                     </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="133.0" spacing="10.0">
+                            <children>
+                                <CheckBox mnemonicParsing="false" fx:id="orderedSteps"/>
+                                <CheckBox mnemonicParsing="false" fx:id="forcedStoryLink"/>
+                        <TextField fx:id="login"/>
+                        <PasswordField fx:id="password"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+                <HBox alignment="TOP_RIGHT" prefHeight="55.0" prefWidth="597.0">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#sentRequest" text="Sent Request" textAlignment="JUSTIFY" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+    <opaqueInsets>
+        <Insets left="10.0" right="10.0" />
+    </opaqueInsets>
+    <padding>
+        <Insets right="10.0" />
+    </padding>
+</Pane>

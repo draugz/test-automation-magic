@@ -1,8 +1,5 @@
-package lv.ctco.zephyr.ui.enums;
+package lv.ctco.zephyr.enums;
 
-/**
- * Created by S7T4M5 on 2016.05.23..
- */
 public enum CssStyle {
 
     ERROR_STYLE("error-massage");
