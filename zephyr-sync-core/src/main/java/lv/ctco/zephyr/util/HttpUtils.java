@@ -1,29 +1,44 @@
 package lv.ctco.zephyr.util;
 
 import com.google.gson.Gson;
+import lv.ctco.zephyr.beans.jira.Login;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Base64;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import static lv.ctco.zephyr.Config.getValue;
-import static lv.ctco.zephyr.enums.ConfigProperty.JIRA_URL;
-import static lv.ctco.zephyr.enums.ConfigProperty.PASSWORD;
-import static lv.ctco.zephyr.enums.ConfigProperty.USERNAME;
+import static lv.ctco.zephyr.enums.ConfigProperty.*;
+import static lv.ctco.zephyr.util.ObjectTransformer.deserialize;
 
 public class HttpUtils {
+    private static final BasicCookieStore COOKIE_STORE = new BasicCookieStore();
+
+    private static String jSessionId;
+
+    static void setAuthorizationCookie(HttpRequestBase request) throws Exception{
+        if(jSessionId == null){
+            String json = new Gson().toJson(new Login(getValue(USERNAME), getValue(PASSWORD)));
+
+            CloseableHttpClient httpClient = getHttpClient();
+            String uri = getValue(JIRA_URL) + "auth/1/session";
+            Utils.log("LOGIN: " + uri);
+            HttpPost loginRequest = new HttpPost(uri);
+            loginRequest.setHeader("Content-Type", "application/json");
+            loginRequest.setEntity(new StringEntity(json));
+            CloseableHttpResponse execute = httpClient.execute(loginRequest);
+            Login.Response loginResponse = deserialize(Utils.readInputStream(execute.getEntity().getContent()), Login.Response.class);
+            jSessionId = loginResponse.getSession().get("value");
+        }
+    }
 
     public static CloseableHttpClient getHttpClient() throws Exception {
-        return HttpClients.createDefault();
+        CloseableHttpClient client = HttpClientBuilder.create()
+                .setDefaultCookieStore(COOKIE_STORE)
+                .build();
+        return client;
     }
 
     public static HttpResponse get(String url) throws Exception {
@@ -35,15 +50,10 @@ public class HttpUtils {
         return httpClient.execute(request);
     }
 
-    private static void setCommonHeaders(HttpRequestBase request) throws IOException, URISyntaxException {
+    private static void setCommonHeaders(HttpRequestBase request) throws Exception {
         request.setHeader("Accept", "application/json");
-        request.setHeader("Authorization", "Basic " + getAuthString());
-    }
-
-    private static String getAuthString() throws IOException, URISyntaxException {
-        String auth = String.format("%s:%s", getValue(USERNAME), getValue(PASSWORD));
-        byte[] bytesEncoded = Base64.getEncoder().encode(auth.getBytes());
-        return new String(bytesEncoded);
+        //request.setHeader("Authorization", "Basic " + getAuthString());
+        setAuthorizationCookie(request);
     }
 
     public static String getAndReturnBody(String url) throws Exception {
